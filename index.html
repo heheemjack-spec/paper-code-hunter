@@ -88,13 +88,17 @@ textarea{max-height:10rem!important}
  <div class="sheet rounded-2xl p-6 w-full max-w-sm text-center">
   <div class="text-5xl mb-2">📜</div>
   <h2 class="text-xl font-bold mb-1">เข้าสู่สมุดบันทึก</h2>
-  <p class="text-xs text-gray-600 mb-4">ชื่อใหม่ = สมัครอัตโนมัติ (รับ 🪙100 + 🔑3)</p>
-  <input id="a-name" maxlength="14" placeholder="ชื่อผู้ใช้" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
-  <input id="a-pw" type="password" placeholder="รหัสผ่าน" class="w-full mb-3 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
-  <button onclick="login()" class="btn w-full bg-vgold text-p9 py-2">🔓 เข้าสู่ระบบ / สมัคร</button>
+  <p class="text-xs text-gray-600 mb-4">สมัครสมาชิกด้วยอีเมลของคุณ</p>
+  <input id="a-email" type="email" autocomplete="email" placeholder="อีเมล" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <input id="a-name" maxlength="14" autocomplete="nickname" placeholder="ชื่อผู้เล่น" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <input id="a-pw" type="password" autocomplete="current-password" placeholder="รหัสผ่าน" class="w-full mb-3 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <button onclick="login()" class="btn w-full bg-vgold text-p9 py-2 mb-2">เข้าสู่ระบบ</button>
+  <button onclick="signup()" class="btn w-full bg-p3 text-white py-2">สมัครสมาชิก</button>
+
   <p id="a-err" class="text-vred text-xs mt-2"></p>
  </div>
 </div>
+ 
 
 <div id="tut" class="fixed bottom-0 inset-x-0 z-[55] hidden p-3" style="padding-bottom:max(.75rem,env(safe-area-inset-bottom))"></div>
 

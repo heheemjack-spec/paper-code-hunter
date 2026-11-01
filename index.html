@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Paper Code Hunter - สมุดบันทึกถอดรหัสลับ</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Charm:wght@400;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config={theme:{extend:{colors:{p2:'#EFE9D5',p3:'#E2D7B5',p1:'#F7F4EB',p8:'#4A3E2C',p9:'#2C2216',vred:'#A33B32',vblue:'#2C5282',vgold:'#D69E2E',vink:'#2D3748'},fontFamily:{hand:['Charm','cursive']}}}}
+</script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{font-family:'Kanit',sans-serif;background:#e5dec9;background-image:radial-gradient(#c2b59b 1px,transparent 0);background-size:24px 24px;color:var(--ink)}
+.sheet{background:#F7F4EB;box-shadow:0 10px 25px -5px rgba(0,0,0,.2)}
+.f-none{border:2px dashed #A0AEC0}.f-ribbon{border:3px solid #E53E3E;box-shadow:0 0 8px rgba(229,62,62,.4)}
+.f-gold{border:4px solid #D69E2E;box-shadow:0 0 12px rgba(214,158,46,.6)}
+.f-scroll{border:4px double #8B4513;background:#FFF8DC}
+.f-diamond{border:4px solid #3182CE;animation:pf 2s infinite}
+.f-rainbow{border:4px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(to right,red,orange,yellow,green,blue,indigo,violet) border-box;animation:pf 3s infinite}
+.f-crown{border:5px double #D69E2E;box-shadow:0 0 20px rgba(214,158,46,.9);background:#FFF9E6}
+.f-neon{border:4px solid #0ff;box-shadow:0 0 14px #0ff,inset 0 0 8px #0ff;background:#06202a}
+@keyframes pf{0%,100%{box-shadow:0 0 8px rgba(49,130,206,.5)}50%{box-shadow:0 0 18px rgba(49,130,206,.9)}}
+@keyframes af{0%,100%{background:rgba(229,62,62,.95)}50%{background:rgba(116,24,24,.95)}}
+.alarm{animation:af .5s infinite}
+.btn{padding:.4rem .9rem;border-radius:.75rem;font-weight:700;font-size:.8rem}
+.card{background:#fff;border:1px solid #E2D7B5;border-radius:1rem;padding:.8rem}
+html{--ink:#2D3748;--ink2:#4b5563;--gold:#8A5A00;color-scheme:light}
+html[data-theme=contrast]{--ink:#000;--ink2:#111;--gold:#5a3a00}
+html[data-theme=dark]{--ink:#f3ecd8;--ink2:#cfc6ae;--gold:#f0c14b}
+main .text-gray-500,main .text-gray-600,#creator .text-gray-500,#creator .text-gray-600{color:var(--ink2)!important}
+main .text-vgold,#creator .text-vgold{color:var(--gold)!important}
+.ui-panel{background:#fff;color:#2D3748}
+html[data-theme=contrast] .sheet,html[data-theme=contrast] .card{background:#fff;border-color:#000}
+html[data-theme=contrast] input,html[data-theme=contrast] textarea,html[data-theme=contrast] select{color:#000;border-color:#000!important}
+html[data-theme=dark] body{background-color:#1c1810;background-image:radial-gradient(#3a3222 1px,transparent 0)}
+html[data-theme=dark] .sheet{background:#2b2418;border-color:#5a4d36}
+html[data-theme=dark] .card,html[data-theme=dark] .bg-white,html[data-theme=dark] .ui-panel{background:#3a3224!important;border-color:#5a4d36;color:var(--ink)}
+html[data-theme=dark] .bg-p1,html[data-theme=dark] .bg-p2{background:#4a3f2a!important}
+html[data-theme=dark] .bg-yellow-100,html[data-theme=dark] .bg-amber-100,html[data-theme=dark] .bg-purple-100{background:#4a3f20!important}
+html[data-theme=dark]{--inbg:#2b2418;--inink:#f3ecd8}
+html[data-theme=dark] input,html[data-theme=dark] textarea,html[data-theme=dark] select{border-color:#6b5c40!important}
+html[data-theme=dark] .text-vblue{color:#8bb8f0!important}
+html[data-theme=dark] .text-vred{color:#ff9a90!important}
+html[data-theme=dark] .text-purple-700{color:#c9adff!important}
+html[data-theme=dark] .text-green-700{color:#7be0a0!important}
+input,textarea,select{background:var(--inbg,#fff)!important;color:var(--inink,#1a1a1a)!important;-webkit-text-fill-color:var(--inink,#1a1a1a);caret-color:var(--inink,#1a1a1a)}
+select option{background:var(--inbg,#fff);color:var(--inink,#1a1a1a)}
+input::placeholder,textarea::placeholder{color:#8a8068!important;-webkit-text-fill-color:#8a8068;opacity:1}
+.sheet,.card{color:var(--ink)}
+html[data-theme=contrast]{--inbg:#fff;--inink:#000}
+input,textarea,select{opacity:1!important;text-shadow:none!important;filter:none!important;mix-blend-mode:normal!important}
+input:-webkit-autofill,textarea:-webkit-autofill{-webkit-text-fill-color:var(--inink,#1a1a1a)!important;box-shadow:0 0 0 1000px var(--inbg,#fff) inset!important;caret-color:var(--inink,#1a1a1a)}
+input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]),textarea{-webkit-appearance:none;appearance:none;box-sizing:border-box;line-height:1.5!important;contain:paint}
+input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]){height:auto;min-height:0;max-height:3.5rem!important;overflow:hidden}
+textarea{max-height:10rem!important}
+</style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+<header class="bg-p8 text-p1 border-b-4 border-vgold sticky top-0 z-30" style="padding-top:env(safe-area-inset-top,0px)">
+ <div class="max-w-5xl mx-auto px-3 py-2 flex flex-wrap justify-between items-center gap-2">
+  <div><h1 class="text-2xl text-vgold font-hand font-bold">📜 Paper Code Hunter</h1><p class="text-[11px] text-p3">สมุดบันทึกถอดรหัสลับประจำวัน</p></div>
+  <div class="flex items-center gap-2"><div id="hdr" class="flex items-center gap-2 text-xs"></div><button onclick="toggleUi()" title="สีและธีม" class="btn bg-p3 text-p9">🎨</button><button onclick="startTut()" title="สอนเล่น" class="btn bg-p3 text-p9">📖</button></div>
+  <div id="ui-panel" class="ui-panel hidden absolute right-2 top-full mt-1 z-40 border border-p3 rounded-xl shadow-xl p-3 text-xs w-64 space-y-3">
+   <div><b>🎨 ธีมหน้าจอ</b><div class="flex gap-1 mt-1"><button onclick="setTheme('light')" class="btn flex-1" style="background:#EFE9D5;color:#2C2216">☀️ สว่าง</button><button onclick="setTheme('dark')" class="btn flex-1" style="background:#2C2216;color:#F7F4EB">🌙 มืด</button><button onclick="setTheme('contrast')" class="btn flex-1" style="background:#fff;color:#000;border:2px solid #000">◐ ตัดกัน</button></div></div>
+   <div><b>🖍️ สีตัวอักษร</b><div class="flex items-center gap-1 mt-1"><button onclick="setInk('#000000')" class="w-7 h-7 rounded-full border-2 border-gray-400" style="background:#000"></button><button onclick="setInk('#2D3748')" class="w-7 h-7 rounded-full border-2 border-gray-400" style="background:#2D3748"></button><button onclick="setInk('#5B3A00')" class="w-7 h-7 rounded-full border-2 border-gray-400" style="background:#5B3A00"></button><button onclick="setInk('#FFFFFF')" class="w-7 h-7 rounded-full border-2 border-gray-400" style="background:#fff"></button><button onclick="setInk('#FFE9A8')" class="w-7 h-7 rounded-full border-2 border-gray-400" style="background:#FFE9A8"></button><input type="color" value="#2D3748" oninput="setInk(this.value)" class="w-8 h-8 p-0 border-0 bg-transparent" title="เลือกสีเอง"></div><button onclick="resetInk()" class="btn w-full mt-2" style="background:#EFE9D5;color:#2C2216">↩️ ใช้สีเริ่มต้นของธีม</button></div>
+  </div>
+ </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-2 mt-4 mb-8 flex-1 w-full">
+ <div class="sheet rounded-2xl p-3 sm:p-6 border-2 border-p3 min-h-[560px]">
+  <nav id="tabs" class="flex flex-wrap gap-1.5 border-b-2 border-p3 pb-3 mb-4"></nav>
+  <section id="view"></section>
+ </div>
+</main>
+
+<div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-[70] hidden bg-p9 text-white px-4 py-2 rounded-xl text-sm shadow-xl max-w-[90vw]"></div>
+
+<div id="alarm" class="fixed inset-0 z-[60] hidden alarm flex-col items-center justify-center text-white text-center p-6">
+ <div class="text-7xl mb-3">🚨</div><h2 class="text-3xl font-bold mb-2">รหัสกับดัก!</h2>
+ <p id="alarm-msg" class="mb-6"></p>
+ <button class="btn bg-white text-vred" onclick="alarm.classList.add('hidden');alarm.classList.remove('flex')">รับทราบ</button>
+</div>
+
+<div id="auth" class="fixed inset-0 z-50 bg-p9/90 flex items-center justify-center p-4">
+ <div class="sheet rounded-2xl p-6 w-full max-w-sm text-center">
+  <div class="text-5xl mb-2">📜</div>
+  <h2 class="text-xl font-bold mb-1">เข้าสู่สมุดบันทึก</h2>
+  <p class="text-xs text-gray-600 mb-4">ชื่อใหม่ = สมัครอัตโนมัติ (รับ 🪙100 + 🔑3)</p>
+  <input id="a-name" maxlength="14" placeholder="ชื่อผู้ใช้" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <input id="a-pw" type="password" placeholder="รหัสผ่าน" class="w-full mb-3 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <button onclick="login()" class="btn w-full bg-vgold text-p9 py-2">🔓 เข้าสู่ระบบ / สมัคร</button>
+  <p id="a-err" class="text-vred text-xs mt-2"></p>
+ </div>
+</div>
+
+<div id="tut" class="fixed bottom-0 inset-x-0 z-[55] hidden p-3" style="padding-bottom:max(.75rem,env(safe-area-inset-bottom))"></div>
+
+<div id="creator" class="fixed inset-0 z-50 hidden bg-p9/80 items-center justify-center p-3">
+ <div class="sheet rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+  <div class="flex items-center justify-between px-4 py-3 bg-purple-700 text-white"><h3 class="font-bold">🛠️ แผงผู้สร้าง</h3><button onclick="closeCreator()" class="text-xl leading-none">✕</button></div>
+  <div id="ct-tabs" class="flex gap-1 p-2 border-b border-p3 overflow-x-auto text-xs"></div>
+  <div id="ct-body" class="p-4 overflow-y-auto text-sm"></div>
+ </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const AV=[['👤','มือใหม่',0],['🧙','พ่อมด',100],['🕵️','นักสืบ',150],['🦊','จิ้งจอก',200],['🐉','มังกร',400],['👑','ราชา',600],['🦄','ยูนิคอร์นหรู',1500],['⚡','เทพสายฟ้า',3000],['🌟','เทพเจ้าดารา',5000],['🐼','แพนด้าจอมเซียน',800],['🚀','นักบินอวกาศ',2000]];
+const FR=[['none','ไม่มีกรอบ',0],['ribbon','ริบบิ้นแดง',80],['scroll','ม้วนกระดาษ',150],['gold','กรอบทอง',200],['diamond','เพชรฟ้า',500],['rainbow','รุ้งประกาย',1200],['crown','มงกุฎทองคำแท้',3500],['neon','นีออนเรืองแสง',900]];
+const TT=[['มือใหม่ถอดรหัส',0],['นักล่าโค้ด',120],['จอมสืบ',250],['ปรมาจารย์รหัส',600],['มหาเศรษฐีสมุดบันทึก',1200],['ผู้พิชิตความมืด',2500],['เทพเจ้าแห่งโค้ดลับ',5000],['ราชันย์นักสืบ',1800]];
+const KEYS=[[1,300],[3,900],[10,3000],[30,9000],[100,30000]];
+const REPLY=['ว่าไง! วันนี้ได้โค้ดอะไรบ้าง?','ระวังรหัสกับดักนะ 😱','ขอบคุณที่ทักมา!','เจอคำใบ้ใหม่แล้วบอกด้วยนะ 🔍','เมื่อกี้ถอดรหัสได้เหรียญเพียบ 🪙'];
+let db,me,tab='news',flt='all',chatWith=null,store={};
+const ld=()=>{try{return JSON.parse(localStorage.getItem('pch1'))}catch(e){return null}};
+const sv=()=>{try{localStorage.setItem('pch1',JSON.stringify(db))}catch(e){}};
+db=ld()||{users:{},cur:null,codes:{PAPER2026:{coins:50},KEYMASTER:{keys:2},GOLDRUSH:{coins:100},TRAP999:{trap:1}},
+news:[
+{id:1,type:'code',title:'โค้ดประจำวัน!',body:'สมุดบันทึกแจกโค้ด: PAPER2026 รับเหรียญทันที',comments:[]},
+{id:2,type:'warning',title:'เตือนภัยรหัสกับดัก',body:'มีรหัสที่ขึ้นต้นด้วย TRAP กำลังระบาด ห้ามกรอกเด็ดขาด!',comments:[]},
+{id:3,type:'hint',title:'คำใบ้: ผู้ถือกุญแจ',body:'"ผู้ที่ควบคุมกุญแจทั้งหมด" ... รหัสคือ KEY + MASTER',comments:[]},
+{id:4,type:'hint',title:'คำใบ้: ตื่นทอง',body:'GOLD + พุ่งเข้าใส่ = รางวัลก้อนโต ...',comments:[]}]};
+if(db.seedv!==2){[['MATHWIZ',{coins:80,mini:1}],['MEMORY77',{coins:30,keys:1,mini:1}],['SNIPER5',{coins:60,mini:1}],['WORDHUNT',{coins:70,mini:1}],['LUCKY100',{coins:100,mini:1}],['PAPERMAP',{coins:120,keys:1,mini:1}]].forEach(([c,d])=>{if(!db.codes[c])db.codes[c]=d});db.seedv=2;sv()}
+const U=()=>db.users[me];
+let admin=false;
+const isAdm=()=>admin&&me==='LA'&&!!U();
+const A_SALT='pch-admin-salt-v1',A_HASH='3f11363ea518c6b390c4ace742ebad7a8662d339d6b8c8295c990b42c9021749';
+async function hp(p,s){const e=new TextEncoder(),k=await crypto.subtle.importKey('raw',e.encode(p),'PBKDF2',false,['deriveBits']);const b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode(s),iterations:150000,hash:'SHA-256'},k,256);return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const rs=()=>[...crypto.getRandomValues(new Uint8Array(8))].map(x=>x.toString(16).padStart(2,'0')).join('');
+async function chk(u,p){if(u.h)return await hp(p,u.s)===u.h;if(u.pw!==undefined&&u.pw===p){u.s=rs();u.h=await hp(p,u.s);delete u.pw;return true}return false}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.add('hidden'),2500)}
+async function login(){
+ const n=$('a-name').value.trim(),p=$('a-pw').value;
+ if(!n||!p){$('a-err').textContent='กรอกชื่อและรหัสผ่านให้ครบ';return}
+ let u=db.users[n];const ns=rs();admin=false;
+ if(n==='LA'){if(await hp(p,A_SALT)!==A_HASH){$('a-err').textContent='ชื่อนี้ถูกสงวนไว้ หรือรหัสผ่านไม่ถูกต้อง';return}admin=true}
+ if(u){if(!admin&&!(await chk(u,p))){$('a-err').textContent='รหัสผ่านไม่ถูกต้อง';return}}
+ else db.users[n]={s:ns,h:await hp(p,ns),coins:100,keys:3,av:'👤',fr:'none',title:'มือใหม่ถอดรหัส',avs:['👤'],frs:['none'],tts:['มือใหม่ถอดรหัส'],used:[],friends:[],chats:{},trophies:[]};
+ me=n;db.cur=n;sv();$('auth').classList.add('hidden');$('a-err').textContent='';render();chatPresence();autoRoom();if(!U().tutDone)setTimeout(startTut,500);
+}
+function logout(){admin=false;closeCreator();hideTut();netStop();lastPres='';if(chatRoom)chatRoom.presence({n:null,av:null}).catch(()=>{});gm=null;clearInterval(gi);db.cur=null;sv();me=null;$('auth').classList.remove('hidden');chatWith=null}
+function trophy(t){if(!U().trophies.includes(t)){U().trophies.push(t);toast('🏆 ได้ถ้วยรางวัล: '+t)}}
+function setTab(t){tab=t;render()}
+function render(){
+ const u=U(),isA=isAdm();
+ $('hdr').innerHTML=`<div class="flex items-center gap-2 bg-p9/80 px-3 py-1.5 rounded-xl border border-vgold/40"><span class="text-2xl">${u.av}</span><div><b>${esc(me)}</b><div class="${u.coins<0?'text-red-400':'text-vgold'}">🪙${u.coins} 🔑${u.keys} 🎫${u.certs||0}</div></div></div><button class="btn bg-p3 text-p9" onclick="logout()">ออก</button>`;
+ const T=[['news','📰 ข่าวสาร'],['redeem','🔑 ถอดรหัส'],['shop','🛒 ร้านค้า'],['avatar','👔 อวตาร์'],['friends','👥 เพื่อนบอท'],['chat','💬 แชตรวม'],['mission','🎯 ภารกิจ'],['earn','💼 หาเหรียญ'],['game','🎮 มินิเกม'],['inv','🎒 คลัง'],['rules','📜 กฎ/สอนเล่น']];
+ $('tabs').innerHTML=T.map(([k,l])=>`<button id="tb-${k}" data-l="${l}" onclick="setTab('${k}')" class="btn ${tab===k?'bg-vgold text-p9 shadow':'hover:bg-p2'}">${l}</button>`).join('')+(isA?`<button onclick="openCreator()" class="btn ml-auto bg-purple-700 text-white">🛠️ ผู้สร้าง</button>`:'');
+ const prev=$('view').scrollTop;
+ $('view').innerHTML=({news:vNews,redeem:vRedeem,shop:vShop,avatar:vAvatar,friends:vFriends,chat:vChat,rules:vRules,mission:vMission,earn:vEarn,game:vGame,inv:vInv})[tab]();
+ if(tab==='friends')bindChat();if(tab==='chat'){unread=0;chatMount()}badge();
+}
+const TY={code:['🎁','text-vblue'],warning:['⚠️','text-vred'],hint:['🔍','text-vgold'],player:['💬','text-purple-700']};
+let showPost=false;
+const othersN=n=>n.comments.filter(c=>c.u!==n.author).length;
+function vNews(){
+ const f=[['all','ทั้งหมด'],['warning','⚠️ เตือนภัย'],['code','🎁 แจกโค้ด'],['hint','🔍 คำใบ้'],['player','💬 ผู้เล่น']];
+ const list=db.news.filter(n=>flt==='all'||n.type===flt).slice().reverse();
+ return `<div class="flex flex-wrap items-center justify-between gap-2 mb-2"><p class="text-xs text-gray-600">คอมเมนต์ใช้ 🔑1 ดอก/ครั้ง (เฉพาะโพสต์ที่ไม่ปิดคอมเมนต์)</p><button onclick="showPost=!showPost;render()" class="btn bg-purple-700 text-white">✍️ เขียนโพสต์</button></div>${showPost?postForm():''}
+ <div class="flex gap-1.5 overflow-x-auto mb-4 text-xs">${f.map(([k,l])=>`<button onclick="flt='${k}';render()" class="btn whitespace-nowrap ${flt===k?'bg-vink text-white':'bg-p2'}">${l}</button>`).join('')}</div>
+ <div class="space-y-4">${list.map(newsCard).join('')||'<p class="text-center text-gray-500 py-8">ไม่มีข่าว</p>'}</div>`;
+}
+function postForm(){
+ return `<div class="card mb-4 border-purple-300"><b class="text-sm">✍️ โพสต์ใหม่ของคุณ</b><p class="text-[11px] text-gray-600 mb-2">ค่าโพสต์: 🔑80 กุญแจ หรือ 🪙10,000 เหรียญ (เลือกจ่ายอย่างใดอย่างหนึ่ง)</p>
+ <input id="pp-title" maxlength="60" placeholder="หัวข้อ" class="w-full mb-2 px-2 py-1.5 text-sm rounded-lg border border-p3"><textarea id="pp-body" rows="3" maxlength="400" placeholder="เนื้อหา" class="w-full mb-2 px-2 py-1.5 text-sm rounded-lg border border-p3"></textarea>
+ <div class="flex flex-wrap gap-2 items-center"><select id="pp-pay" class="px-2 py-1.5 text-sm rounded-lg border border-p3"><option value="keys">จ่ายด้วย 🔑80</option><option value="coins">จ่ายด้วย 🪙10,000</option>${((U().cards||{}).post)?`<option value="card">จ่ายด้วยบัตร 📮 (มี ${U().cards.post} ใบ)</option>`:''}</select><label class="text-xs flex items-center gap-1"><input id="pp-closed" type="checkbox"> ปิดคอมเมนต์ตั้งแต่แรก</label><button onclick="submitPost()" class="btn bg-purple-700 text-white ml-auto">📢 โพสต์</button></div></div>`;
+}
+function submitPost(){
+ const u=U(),t=$('pp-title').value.trim(),b=$('pp-body').value.trim(),pay=$('pp-pay').value;
+ if(!t||!b)return toast('กรอกหัวข้อและเนื้อหาให้ครบ');
+ if(pay==='keys'){if(u.keys<80)return toast('กุญแจไม่พอ (ต้องใช้ 80 ดอก)');u.keys-=80}
+ else if(pay==='card'){if(!(u.cards&&u.cards.post))return toast('ไม่มีบัตรโพสต์');u.cards.post--}
+ else{if(u.coins<10000)return toast('เหรียญไม่พอ (ต้องใช้ 10,000)');u.coins-=10000}
+ db.news.push({id:Date.now(),type:'player',author:me,title:t,body:b,comments:[],closed:$('pp-closed').checked,cap:50});
+ trophy('นักเขียนสมุดบันทึก');showPost=false;sv();toast('📢 โพสต์แล้ว!');render();
+}
+function newsCard(n){
+ const own=n.author===me,adm=isAdm(),mgr=own||adm,cap=n.cap||50,used=othersN(n);
+ const canC=!n.closed||mgr,full=used>=cap&&!mgr;
+ return `<article class="card"><h3 class="font-bold ${TY[n.type][1]}">${TY[n.type][0]} ${esc(n.title)}${adm?` <button onclick="delNews(${n.id})" class="text-xs text-vred ml-2">🗑️ ลบ</button>`:''}</h3>
+ <div class="text-[11px] text-gray-500">${n.author?'โดย '+esc(n.author):'📢 ประกาศระบบ'} · 💬 ${used}/${cap}${n.closed?' · 🔒 ปิดคอมเมนต์':''}</div>
+ <p class="text-sm my-1">${esc(n.body)}</p>
+ ${mgr?`<div class="flex flex-wrap gap-2 my-1"><button onclick="toggleClose(${n.id})" class="btn bg-p2">${n.closed?'🔓 เปิดคอมเมนต์':'🔒 ปิดคอมเมนต์'}</button>${cap<70?`<button onclick="extendCap(${n.id})" class="btn bg-p2">➕ เพิ่มโควต้าเป็น 70 (${own?'🪙3,000':'ฟรี'})</button>`:'<span class="text-xs text-gray-500 self-center">โควต้าขยายครบ 70 แล้ว</span>'}</div>`:''}
+ <div class="mt-2 space-y-1 text-xs">${n.comments.map(c=>`<div class="bg-p1 rounded-lg px-2 py-1"><b>${esc(c.u)}:</b> ${esc(c.t)}</div>`).join('')}</div>
+ ${!canC?'<p class="text-xs text-gray-500 mt-2">🔒 โพสต์นี้ปิดคอมเมนต์</p>':full?`<p class="text-xs text-vred mt-2">คอมเมนต์เต็มแล้ว (${cap}) ${n.author?'· เจ้าของโพสต์เพิ่มโควต้าได้':''}</p>`:`<div class="flex gap-2 mt-2"><input id="cm${n.id}" placeholder="คอมเมนต์ (🔑 -1)" class="flex-1 px-2 py-1 text-xs rounded-lg border border-p3"><button class="btn bg-vgold text-p9" onclick="comment(${n.id})">ส่ง</button></div>`}</article>`;
+}
+function comment(id){
+ const n=db.news.find(x=>x.id===id),i=$('cm'+id),t=i&&i.value.trim();if(!n||!t)return;
+ const mgr=n.author===me||isAdm();
+ if(n.closed&&!mgr)return toast('โพสต์นี้ปิดคอมเมนต์');
+ if(!mgr&&othersN(n)>=(n.cap||50))return toast('คอมเมนต์เต็มแล้ว');
+ if(U().keys<1){toast('กุญแจไม่พอ! ไปซื้อที่ร้านค้า');return}
+ U().keys--;bump('cm');n.comments.push({u:me,t});trophy('นักวิจารณ์คนแรก');sv();render();
+}
+function toggleClose(id){
+ const n=db.news.find(x=>x.id===id);if(!n||(n.author!==me&&!isAdm()))return;
+ n.closed=!n.closed;sv();toast(n.closed?'🔒 ปิดคอมเมนต์แล้ว':'🔓 เปิดคอมเมนต์แล้ว');render();
+}
+function extendCap(id){
+ const n=db.news.find(x=>x.id===id),u=U();if(!n)return;
+ const own=n.author===me;if(!own&&!isAdm())return;
+ if((n.cap||50)>=70)return toast('ขยายครบ 70 แล้ว');
+ const c=own?3000:0;if(u.coins<c)return toast('เหรียญไม่พอ (ต้องใช้ 3,000)');
+ u.coins-=c;n.cap=70;sv();toast('➕ เพิ่มโควต้าเป็น 70 แล้ว');render();
+}
+
+function vRedeem(){
+ const h=U().used;
+ return `<div class="max-w-md mx-auto text-center py-4"><div class="text-5xl mb-2">🗝️</div><h2 class="text-xl font-bold mb-1">ป้อนรหัสลับเพื่อรับรางวัล</h2>
+ <p class="text-xs text-gray-600 mb-4">อ่านข่าวและคำใบ้ให้ดี <b class="text-vred">รหัสบางชุดคือกับดัก!</b></p>
+ <div class="card flex gap-2 mb-4"><input id="code-in" onkeydown="if(event.key==='Enter')submitCode()" placeholder="เช่น PAPER2026" class="flex-1 px-3 py-2 rounded-xl border-2 border-p3 font-mono font-bold uppercase focus:outline-none focus:border-vgold"><button onclick="submitCode()" class="btn bg-vgold text-p9">🔓 ถอดรหัส</button></div>
+ <div class="card text-left"><div class="font-bold text-sm mb-1">📜 ประวัติ (${h.length})</div><div class="text-xs font-mono space-y-1 max-h-40 overflow-y-auto">${h.length?h.slice().reverse().map(x=>`<div>${esc(x)}</div>`).join(''):'<i class="text-gray-500">ยังไม่มีประวัติ</i>'}</div></div></div>`;
+}
+function submitCode(){
+ const c=$('code-in').value.trim().toUpperCase();if(!c)return;
+ const u=U(),d=db.codes[c];
+ if(!d){toast('❌ ไม่พบรหัสนี้');return}
+ if(d.exp&&Date.now()>d.exp){toast('⌛ โค้ดนี้หมดอายุแล้ว');return}
+ if(u.used.some(x=>x.startsWith(c+' ')))return toast('ใช้รหัสนี้ไปแล้ว');
+ if(d.cat){u.cu=u.cu||{};if(u.cu[d.cat])return toast(`📂 หมวด "${d.cat}" ใช้ได้เพียง 1 โค้ด (คุณใช้ ${u.cu[d.cat]} ไปแล้ว)`);u.cu[d.cat]=c}
+ if(d.trap&&u.fx&&u.fx.shield){delete u.fx.shield;u.used.push(c+' → 🛡️ กันกับดักสำเร็จ');sv();toast('🛡️ บัตรกันกับดักช่วยไว้ได้!');render();return}
+ if(d.trap){const l=d.coins!==undefined?d.coins:50,kl=d.keys!==undefined?d.keys:1;u.coins-=l;u.keys-=kl;u.used.push(c+' → 💀 กับดัก -'+l+'🪙 -'+kl+'🔑');sv();
+  $('alarm-msg').textContent=`คุณถูกหลอก! เสีย ${l} เหรียญ และกุญแจ ${kl} ดอก${u.coins<0?` (ตอนนี้ติดหนี้ ${-u.coins} เหรียญ ไปหาโค้ดหรือเล่นมินิเกมเพื่อใช้คืน)`:''}`;$('alarm').classList.remove('hidden');$('alarm').classList.add('flex');render();return}
+ const mx=u.fx&&u.fx.x2?2:1;if(mx>1)delete u.fx.x2;const rc=(d.coins||0)*mx,rk=(d.keys||0)*mx,rt=d.certs||0;u.coins+=rc;u.keys+=rk;u.certs=(u.certs||0)+rt;
+ u.used.push(`${c} → +${rc}🪙 +${rk}🔑${rt?` +${rt}🎫`:''}${mx>1?' (×2)':''}`);
+ trophy('นักถอดรหัส');if(u.used.length>=3)trophy('นักล่าโค้ดตัวจริง');
+ sv();toast(`✅ สำเร็จ! +${rc}🪙 +${rk}🔑${rt?` +${rt}🎫`:''}${mx>1?' (บัตร ×2)':''}`);render();
+}
+const REQ={'av:🌟':2,'av:🚀':1,'fr:crown':2,'fr:rainbow':1,'tt:มหาเศรษฐีสมุดบันทึก':1,'tt:ผู้พิชิตความมืด':1,'tt:เทพเจ้าแห่งโค้ดลับ':2,'tt:ราชันย์นักสืบ':1,'card:post':1,'card:map':1,'key:4':1};
+const rq=k=>REQ[k]||0,rqT=k=>rq(k)?` +🎫${rq(k)}`:'';
+const bump=k=>{const u=U();u.st=u.st||{};u.st[k]=(u.st[k]||0)+1};
+const stat=k=>((U().st||{})[k]||0);
+const codesOk=()=>U().used.filter(x=>x.includes('→ +')).length;
+const rwT=r=>`${r.certs?`🎫${r.certs} `:''}${r.coins?`🪙${r.coins} `:''}${r.keys?`🔑${r.keys}`:''}`;
+const MISSIONS=[
+['c3','ใช้โค้ดสำเร็จครบ 3 โค้ด',codesOk,3,{certs:1,coins:50}],
+['c8','ใช้โค้ดสำเร็จครบ 8 โค้ด',codesOk,8,{certs:1,keys:2}],
+['c15','ใช้โค้ดสำเร็จครบ 15 โค้ด',codesOk,15,{certs:2}],
+['g10','เล่นมินิเกมครบ 10 ครั้ง',()=>stat('games'),10,{certs:1,coins:100}],
+['ci7','เช็กอินรายวันครบ 7 ครั้ง (รวม)',()=>stat('ci'),7,{certs:1}],
+['cm10','คอมเมนต์ครบ 10 ครั้ง',()=>stat('cm'),10,{certs:1,coins:80}]];
+function payFor(key,price){
+ const u=U(),n=rq(key);
+ if(u.coins<price){toast('เหรียญไม่พอ');return false}
+ if((u.certs||0)<n){toast(`ต้องมีบัตรรับรอง 🎫${n} ใบ (คุณมี ${u.certs||0})`);return false}
+ u.coins-=price;u.certs=(u.certs||0)-n;return true;
+}
+function buy(kind,i){
+ const u=U();
+ if(kind==='key'){if(!payFor('key:'+i,KEYS[i][1]))return;u.keys+=KEYS[i][0]}
+ else{const L={av:[AV,'avs',2],fr:[FR,'frs',2],tt:[TT,'tts',1]}[kind],it=L[0][i],id=it[0];
+  if(u[L[1]].includes(id))return toast('มีแล้ว');
+  if(!payFor(kind+':'+id,it[L[2]]))return;u[L[1]].push(id)}
+ trophy('นักช้อป');if(u.coins>=10000)trophy('เศรษฐีสมุดบันทึก');
+ sv();toast('🛍️ ซื้อสำเร็จ!');render();
+}
+function vMission(){
+ const u=U(),mc=u.mc||{};
+ return `<div class="max-w-xl mx-auto"><h2 class="text-xl font-bold mb-1">🎯 โหมดภารกิจ</h2><p class="text-xs text-gray-600 mb-3">ทำภารกิจให้ครบแล้วกดรับรางวัล (รับได้ครั้งเดียวต่อภารกิจ) รางวัลมี 🎫 บัตรรับรอง ไว้ซื้อสินค้าพิเศษในร้านค้า · ตอนนี้คุณมี 🎫 <b>${u.certs||0}</b> ใบ</p><div class="space-y-3">${MISSIONS.map(m=>{const p=Math.min(m[2](),m[3]),done=!!mc[m[0]],ok=p>=m[3];return `<div class="card"><div class="flex justify-between text-sm font-bold"><span>${m[1]}</span><span>${p}/${m[3]}</span></div><div class="h-2 bg-p2 rounded-full my-2 overflow-hidden"><div class="h-full bg-vgold" style="width:${p/m[3]*100}%"></div></div><div class="flex justify-between items-center"><span class="text-xs">รางวัล: ${rwT(m[4])}</span><button onclick="claimM('${m[0]}')" ${done||!ok?'disabled':''} class="btn bg-vgold text-p9 disabled:bg-gray-300">${done?'✅ รับแล้ว':ok?'🎁 รับรางวัล':'ยังไม่ครบ'}</button></div></div>`}).join('')}</div></div>`;
+}
+function claimM(id){
+ const u=U(),m=MISSIONS.find(x=>x[0]===id);u.mc=u.mc||{};
+ if(!m||u.mc[id]||m[2]()<m[3])return;
+ const r=m[4];u.certs=(u.certs||0)+(r.certs||0);u.coins+=r.coins||0;u.keys+=r.keys||0;u.mc[id]=1;
+ trophy('นักทำภารกิจ');sv();toast('🎯 รับรางวัลภารกิจแล้ว: '+rwT(r));render();
+}
+
+function vShop(){
+ const u=U(),own=(a,id)=>a.includes(id);
+ const b=(k,i,id,a,p)=>own(a,id)?'<span class="text-xs text-green-700 font-bold">✔ มีแล้ว</span>':`<button onclick="buy('${k}',${i})" class="btn bg-vgold text-p9">🪙${p}${rqT(k+':'+id)}</button>`;
+ return `<div class="text-xs font-bold mb-3 flex gap-2"><span class="bg-yellow-100 px-3 py-1 rounded-xl">🪙 ${u.coins}</span><span class="bg-amber-100 px-3 py-1 rounded-xl">🔑 ${u.keys}</span><span class="bg-purple-100 px-3 py-1 rounded-xl">🎫 ${u.certs||0}</span><span class="text-gray-500 font-normal self-center">สินค้าที่มี +🎫 ต้องใช้บัตรรับรองด้วย</span></div>
+ <h3 class="font-bold text-vgold mb-2">🔑 กุญแจคอมเมนต์</h3><div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">${KEYS.map((k,i)=>`<div class="card text-center"><div class="text-2xl">🔑×${k[0]}</div><button onclick="buy('key',${i})" class="btn bg-vgold text-p9 mt-1">🪙${k[1]}${rqT('key:'+i)}</button></div>`).join('')}</div>
+ <h3 class="font-bold text-purple-700 mb-2">🎴 บัตรพิเศษ (ใช้แล้วหมดไป)</h3><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">${CARDS.map((c,i)=>`<div class="card text-center"><div class="text-3xl">${c[1]}</div><div class="text-xs font-bold">${c[2]}</div><div class="text-[11px] text-gray-600 mb-1">${c[3]}</div><button onclick="buyCard(${i})" class="btn bg-vgold text-p9">🪙${c[4]}${rqT('card:'+c[0])}</button><div class="text-[10px] text-gray-500 mt-1">มีอยู่ ${(u.cards||{})[c[0]]||0} ใบ</div></div>`).join('')}</div>
+ <h3 class="font-bold text-vblue mb-2">🎭 อวตาร์ (มีระดับราคาแพงพิเศษสำหรับคนกระเป๋าหนัก)</h3><div class="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-5">${AV.map((a,i)=>`<div class="card text-center"><div class="text-3xl">${a[0]}</div><div class="text-[11px]">${a[1]}</div>${b('av',i,a[0],u.avs,a[2])}</div>`).join('')}</div>
+ <h3 class="font-bold text-vgold mb-2">🖼️ กรอบรูปโปรไฟล์ระดับหรู</h3><div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">${FR.map((a,i)=>`<div class="card text-center"><div class="w-12 h-12 mx-auto rounded-xl bg-white f-${a[0]}"></div><div class="text-[11px] my-1">${a[1]}</div>${b('fr',i,a[0],u.frs,a[2])}</div>`).join('')}</div>
+ <h3 class="font-bold text-vred mb-2">🏅 ฉายาสุดพรีเมียม</h3><div class="grid grid-cols-1 sm:grid-cols-3 gap-3">${TT.map((a,i)=>`<div class="card text-center"><div class="text-xs font-bold mb-1">[${a[0]}]</div>${b('tt',i,a[0],u.tts,a[1])}</div>`).join('')}</div>`;
+}
+let gm=null,gi=null,gres='';
+const rnd=n=>Math.floor(Math.random()*n);
+const SYM=['🔴','🔵','🟢','🟡'];
+const WORDS=['PAPER','HUNTER','SECRET','TREASURE','NOTEBOOK','ADVENTURE','CIPHER','MYSTERY','CLUE','GOLDEN','RIDDLE','PUZZLE'];
+const INP='w-full px-3 py-2 text-xl rounded-xl border-2 border-p3 text-center';
+const GAMES=[['math','🧮','คิดเลขเร็ว','20 วิ ข้อละ +2🪙 · ตอบถูก 8 ข้อขึ้นไป = เจอโค้ดลับ'],['mem','🧠','จำลำดับสี','จำลำดับสีแล้วกดตาม ด่านละ +3🪙 · ผ่าน 5 ด่าน = เจอโค้ดลับ'],['tap','🎯','แตะเป้า','15 วิ เป้าละ +1🪙 · แตะ 12 เป้าขึ้นไป = เจอโค้ดลับ'],['word','🔤','เรียงอักษร','เรียงตัวอักษรอังกฤษ 5 คำ คำละ +4🪙 · ถูก 4 คำ = เจอโค้ดลับ'],['num','🔢','ทายตัวเลข','ทายเลข 1-100 ภายใน 7 ครั้ง ได้ 5-35🪙 · ทายใน 5 ครั้ง = เจอโค้ดลับ'],['hunt','🔍','ล่ากระดาษลับ','เปิดกระดาษ 5 ใบจาก 16 ใบ มีโค้ดลับซ่อนอยู่ แต่มีกับดักและโค้ดปลอมด้วย!'],['safe','🔐','เปิดตู้เซฟลับ','ความยาก 7/10 · ต้องใช้ 🎫 1 ใบเพื่อเข้าเล่น · เดารหัส 4 หลักใน 8 ครั้ง/150 วิ · ชนะ +500🪙 และได้โค้ดลับ มีโอกาส 50% ได้บัตรคืน']];
+const freeCodes=()=>{const u=U();return Object.keys(db.codes).filter(c=>db.codes[c].mini&&!db.codes[c].trap&&!u.used.some(x=>x.startsWith(c+' '))&&!(db.codes[c].cat&&(u.cu||{})[db.codes[c].cat])&&!(db.codes[c].exp&&Date.now()>db.codes[c].exp))};
+const pickMini=()=>{const f=freeCodes();if(!f.length)return null;const c=f[rnd(f.length)],u=U();u.found=u.found||[];if(!u.found.includes(c))u.found.push(c);return c};
+const fakeCode=()=>Array.from({length:7},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[rnd(32)]).join('');
+const scr=w=>{let s;do{s=w.split('').sort(()=>Math.random()-.5).join('')}while(s===w);return s};
+function vGame(){
+ const u=U();
+ return `<div class="max-w-xl mx-auto py-2"><div class="text-center mb-2"><div class="text-4xl">🎮</div><h2 class="text-xl font-bold">ศูนย์มินิเกม</h2></div>${u.coins<0?`<p class="text-vred font-bold text-sm mb-2 text-center">คุณติดหนี้ ${-u.coins} เหรียญ</p>`:''}<div id="gbox" class="card">${gm?gameBody():gameMenu()}</div></div>`;
+}
+function gameMenu(){
+ const u=U(),w=Math.ceil(((u.cd||0)-Date.now())/1000);
+ return `${gres||''}${w>0?`<p class="text-center text-sm my-2">☕ พักก่อน ${Math.floor(w/60)}:${String(w%60).padStart(2,'0')} นาที (ใช้บัตร ⏩ ข้ามได้)</p>`:''}<p class="text-xs text-gray-600 my-2 text-center">เล่นให้ถึงเป้าหมายเพื่อ "เจอโค้ดลับ" (และมีโอกาส 15% ได้ 🎫 บัตรรับรอง) แล้วนำไปพิมพ์ในแท็บถอดรหัส · โค้ดลับที่คุณยังไม่ได้ใช้เหลืออีก ${freeCodes().length} ชุด</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${GAMES.map(g=>`<div class="card"><div class="flex items-center gap-2"><span class="text-3xl">${g[1]}</span><b>${g[2]}</b></div><p class="text-[11px] text-gray-600 my-1">${g[3]}</p><button onclick="startG('${g[0]}')" ${(w>0||(g[0]==='safe'&&!(u.certs>0)))?'disabled':''} class="btn bg-vgold text-p9 disabled:bg-gray-300 w-full">${g[0]==='safe'?(u.certs>0?'🎫 ใช้บัตร 1 ใบ แล้วเล่น':'🔒 ต้องมีบัตรรับรอง 🎫 1 ใบ'):'▶️ เล่น'}</button></div>`).join('')}</div>`;
+}
+function gameBody(){
+ const g=gm;
+ if(g.type==='math')return `<div class="text-center"><div class="flex justify-between text-sm font-bold mb-2"><span>⏱️ <span id="gt">${g.left}</span> วิ</span><span>✅ ${g.score}</span></div><div class="text-3xl font-bold mb-3">${g.a} ${g.op} ${g.b} = ?</div><input id="gans" type="number" inputmode="numeric" onkeydown="if(event.key==='Enter')ansGame()" class="${INP} mb-2"><button onclick="ansGame()" class="btn bg-vgold text-p9 w-full">ส่งคำตอบ</button></div>`;
+ if(g.type==='tap')return `<div class="flex justify-between text-sm font-bold mb-2"><span>⏱️ <span id="gt">${g.left}</span> วิ</span><span>🎯 <span id="tsc">${g.score}</span></span></div><div class="relative h-64 bg-p1 rounded-xl overflow-hidden"><button id="tgt" onclick="tapHit()" style="left:40%;top:40%" class="absolute w-12 h-12 rounded-full bg-vred text-2xl text-white shadow">🎯</button></div>`;
+ if(g.type==='mem')return `<div class="text-center"><div id="mdisp" class="text-6xl h-20 flex items-center justify-center">⬜</div><div class="text-sm font-bold mb-3">ด่านที่ ${g.done+1} · ผ่านแล้ว ${g.done}</div><div class="grid grid-cols-4 gap-2">${SYM.map(s=>`<button onclick="memTap('${s}')" class="text-4xl p-3 bg-p1 rounded-xl">${s}</button>`).join('')}</div></div>`;
+ if(g.type==='word')return `<div class="text-center"><div class="text-xs mb-1">คำที่ ${g.i+1}/5 · ถูก ${g.ok}</div><div class="text-4xl font-bold my-3 font-mono">${g.sc.split('').join(' ')}</div><input id="wans" onkeydown="if(event.key==='Enter')wordGo(0)" class="${INP} uppercase"><div class="flex gap-2 mt-2"><button onclick="wordGo(0)" class="btn flex-1 bg-vgold text-p9">ส่ง</button><button onclick="wordGo(1)" class="btn flex-1 bg-p2">ข้าม</button></div></div>`;
+ if(g.type==='num')return `<div class="text-center"><div class="text-sm">ครั้งที่ ${g.tries}/7</div><div class="my-2 font-bold">${g.hint}</div><input id="nans" type="number" inputmode="numeric" onkeydown="if(event.key==='Enter')numGo()" class="${INP} mb-2"><button onclick="numGo()" class="btn bg-vgold text-p9 w-full">ทาย</button></div>`;
+ if(g.type==='safe')return `<div class="text-center"><div class="flex justify-between text-sm font-bold mb-1"><span>⏱️ <span id="gt">${g.left}</span> วิ</span><span>🔐 เหลือ ${8-g.tries.length} ครั้ง</span></div><p class="text-[11px] text-gray-600 mb-2">รหัส 4 หลัก ใช้เลข 1-6 (เลขซ้ำได้) · 🟢 = เลขถูกและตำแหน่งถูก · 🟡 = เลขถูกแต่ตำแหน่งผิด</p><div class="space-y-1 mb-2 text-left">${g.tries.map(t=>`<div class="flex justify-between bg-p1 rounded-lg px-3 py-1 font-mono"><b class="tracking-widest">${t.g}</b><span>🟢${t.b} 🟡${t.w}</span></div>`).join('')}</div><input id="sans" inputmode="numeric" maxlength="4" onkeydown="if(event.key==='Enter')safeGo()" placeholder="เช่น 1234" class="${INP} mb-2 tracking-widest"><button onclick="safeGo()" class="btn bg-vgold text-p9 w-full">ลองรหัส</button></div>`;
+ return `<div class="text-center text-sm font-bold mb-2">เปิดได้อีก ${g.picks} ใบ</div><div class="grid grid-cols-4 gap-2 mb-3">${g.cells.map((k,i)=>{const o=g.open.includes(i);const ic={code:'🗝️',fake:'📃',coin:'🪙',trap:'💀',cert:'🎫',empty:'🕸️'}[k];return `<button onclick="huntGo(${i})" class="text-3xl py-3 rounded-xl ${o?'bg-p3':'bg-p1 hover:bg-p2'}">${o?ic:'📄'}</button>`}).join('')}</div><div class="text-xs space-y-1">${g.log.map(l=>`<div class="bg-p1 rounded-lg px-2 py-1">${l}</div>`).join('')}</div>`;
+}
+function drawGame(){const b=$('gbox');if(b){b.innerHTML=gm?gameBody():gameMenu();const i=$('gans')||$('wans')||$('nans')||$('sans');if(i)i.focus()}}
+setInterval(()=>{if(me&&U()&&tab==='game'&&!gm&&(U().cd||0)>Date.now()-1100)drawGame()},1000);
+function startG(t){
+ const u=U();if((u.cd||0)>Date.now())return toast('พักก่อนนะ');
+ gres='';clearInterval(gi);
+ if(t==='math'){gm={type:'math',left:20,score:0};nextQ();gi=setInterval(tickGame,1000)}
+ else if(t==='tap'){gm={type:'tap',left:15,score:0};gi=setInterval(tickGame,1000)}
+ else if(t==='mem'){gm={type:'mem',done:0,pos:0,seq:[SYM[rnd(4)]],lock:1}}
+ else if(t==='word'){const ws=WORDS.slice().sort(()=>Math.random()-.5).slice(0,5);gm={type:'word',ws,i:0,ok:0,sc:scr(ws[0])}}
+ else if(t==='num'){gm={type:'num',n:1+rnd(100),tries:0,hint:'ลองทายดู!'}}
+ else if(t==='safe'){if((u.certs||0)<1)return toast('ต้องมีบัตรรับรอง 🎫 1 ใบ');u.certs--;sv();gm={type:'safe',left:150,tries:[],secret:Array.from({length:4},()=>1+rnd(6)).join('')};gi=setInterval(tickGame,1000)}
+ else{const k=['code','fake','fake','trap','coin','coin','coin','coin'];if(Math.random()<.3)k.push('cert');while(k.length<16)k.push('empty');gm={type:'hunt',cells:k.sort(()=>Math.random()-.5),open:[],picks:5,log:[]}}
+ if(t==='safe')render();else drawGame();if(t==='mem')memPlay();
+}
+function endG(coins,goal,msg){
+ const u=U();bump('games');let dbl='';if(coins>0&&u.fx&&u.fx.gx2){coins*=2;delete u.fx.gx2;dbl=' (💰 ×2)'}clearInterval(gi);gm=null;u.coins+=coins;u.cd=Date.now()+300000;
+ let r=`<div class="text-center mb-2"><div class="font-bold">${msg}</div>${coins?`<div>ได้ +${coins} 🪙${dbl}</div>`:''}`;
+ if(goal){trophy('นักล่าโค้ดในเกม');if(Math.random()<.15){u.certs=(u.certs||0)+1;r+='<div class="mt-2 p-2 bg-purple-100 rounded-lg">🎫 โชคดี! ได้บัตรรับรอง +1</div>'}const c=pickMini();r+=c?`<div class="mt-2 p-2 bg-yellow-100 rounded-lg">🗝️ เจอโค้ดลับ: <b class="font-mono">${c}</b><br><span class="text-xs">ไปพิมพ์ในแท็บ "ถอดรหัส" เพื่อรับรางวัล</span></div>`:`<div class="text-xs mt-1">โค้ดลับหมดแล้ว (รอผู้สร้างเพิ่ม)</div>`}
+ gres=r+'</div>';sv();render();
+}
+function tickGame(){
+ if(!gm||!gm.left){clearInterval(gi);return}
+ gm.left--;const t=$('gt');if(t)t.textContent=gm.left;
+ if(gm.left<=0){const g=gm;if(g.type==='safe')endG(0,false,`หมดเวลา! รหัสคือ ${g.secret}`);else if(g.type==='math')endG(g.score*2,g.score>=8,`ตอบถูก ${g.score} ข้อ`);else endG(g.score,g.score>=12,`แตะโดน ${g.score} เป้า`)}
+}
+function nextQ(){const o=['+','-','×'][rnd(3)],m=o==='×'?9:30;let a=1+rnd(m),b=1+rnd(m);if(o==='-'&&b>a)[a,b]=[b,a];gm.a=a;gm.b=b;gm.op=o;gm.ans=o==='+'?a+b:o==='-'?a-b:a*b}
+function ansGame(){const i=$('gans');if(!i||i.value===''||!gm)return;if(+i.value===gm.ans)gm.score++;nextQ();drawGame()}
+function tapHit(){gm.score++;const b=$('tgt');b.style.left=rnd(86)+'%';b.style.top=rnd(80)+'%';$('tsc').textContent=gm.score}
+function memPlay(){
+ const g=gm;g.lock=1;let i=0;
+ const step=()=>{if(gm!==g)return;const d=$('mdisp');
+  if(i>=g.seq.length){g.lock=0;if(d)d.textContent='👆';return}
+  if(d)d.textContent=g.seq[i];
+  setTimeout(()=>{if(gm!==g)return;const e=$('mdisp');if(e)e.textContent='⬜';i++;setTimeout(step,250)},550)};
+ setTimeout(step,600);
+}
+function memTap(s){
+ const g=gm;if(!g||g.lock)return;
+ if(s!==g.seq[g.pos])return endG(g.done*3,g.done>=5,`ผิดลำดับ! ผ่าน ${g.done} ด่าน`);
+ g.pos++;
+ if(g.pos>=g.seq.length){g.done++;g.pos=0;g.seq.push(SYM[rnd(4)]);drawGame();memPlay()}
+}
+function wordGo(skip){
+ const g=gm,i=$('wans');if(!g)return;
+ if(!skip&&i&&i.value.trim().toUpperCase()===g.ws[g.i]){g.ok++;toast('✅ ถูกต้อง!')}else toast('❌ คำที่ถูกคือ '+g.ws[g.i]);
+ g.i++;if(g.i>=5)return endG(g.ok*4,g.ok>=4,`ตอบถูก ${g.ok}/5 คำ`);
+ g.sc=scr(g.ws[g.i]);drawGame();
+}
+function numGo(){
+ const i=$('nans'),g=gm;if(!i||i.value===''||!g)return;
+ const v=+i.value;g.tries++;
+ if(v===g.n)return endG([35,30,25,20,15,10,5][g.tries-1],g.tries<=5,`ทายถูก! เลขคือ ${g.n} ใช้ ${g.tries} ครั้ง`);
+ if(g.tries>=7)return endG(0,false,`หมดโอกาส เลขคือ ${g.n}`);
+ g.hint=v<g.n?'⬆️ ต่ำไป ลองเลขที่มากกว่านี้':'⬇️ สูงไป ลองเลขที่น้อยกว่านี้';drawGame();
+}
+function safeGo(){
+ const i=$('sans'),g=gm;if(!i||!g||g.type!=='safe')return;
+ const v=i.value.trim();if(!/^[1-6]{4}$/.test(v))return toast('ใส่เลข 4 หลัก ใช้เฉพาะ 1-6');
+ let b=0;const sa=[],va=[];
+ for(let k=0;k<4;k++){if(v[k]===g.secret[k])b++;else{sa.push(g.secret[k]);va.push(v[k])}}
+ let w=0;va.forEach(x=>{const j=sa.indexOf(x);if(j>=0){w++;sa.splice(j,1)}});
+ g.tries.push({g:v,b,w});
+ if(b===4){let m=`🔓 เปิดตู้เซฟสำเร็จ! ใช้ ${g.tries.length} ครั้ง`;if(Math.random()<.5){U().certs=(U().certs||0)+1;m+=' · 🎫 คืนบัตรให้ 1 ใบ'}trophy('ผู้ปลดล็อกตู้เซฟ');return endG(500,true,m)}
+ if(g.tries.length>=8)return endG(0,false,`ตู้เซฟล็อกถาวร! รหัสคือ ${g.secret}`);
+ drawGame();
+}
+function huntGo(i){
+ const g=gm,u=U();if(!g||g.open.includes(i)||g.picks<=0)return;
+ g.open.push(i);g.picks--;const k=g.cells[i];
+ if(k==='code'){const c=pickMini();if(c)g.log.push(`🗝️ พบโค้ดลับ: <b class="font-mono">${c}</b>`);else{u.coins+=50;g.log.push('🗝️ พบกระดาษลับ แต่ไม่มีโค้ดเหลือ ได้ +50🪙')}}
+ else if(k==='fake')g.log.push(`📃 โค้ด: <b class="font-mono">${fakeCode()}</b> (เชื่อได้ไหมนะ?)`);
+ else if(k==='coin'){const v=15+rnd(26);u.coins+=v;g.log.push(`🪙 เจอเหรียญ +${v}`)}
+ else if(k==='cert'){u.certs=(u.certs||0)+1;g.log.push('🎫 พบบัตรรับรอง +1!')}
+ else if(k==='trap'){u.coins-=30;g.log.push('💀 กับดัก! เสีย 30🪙')}
+ else g.log.push('🕸️ กระดาษเปล่า');
+ if(g.picks<=0)endG(0,false,'สรุปการล่ากระดาษ')&&0,gres=gres.replace('</div></div>',`</div><div class="text-xs space-y-1 text-left">${g.log.map(l=>`<div class="bg-p1 rounded-lg px-2 py-1">${l}</div>`).join('')}</div></div>`),render();else drawGame();
+}
+const CARDS=[['shield','🛡️','บัตรกันกับดัก','กันรหัสกับดักครั้งถัดไป 1 ครั้ง',400],['scan','🔎','แว่นตรวจกับดัก','พิมพ์รหัสเพื่อตรวจว่าเป็นกับดักหรือไม่',150],['x2','✨','บัตรรางวัลคูณสอง','โค้ดรางวัลที่แลกครั้งถัดไปได้ ×2 (ไม่รวมบัตรรับรอง)',350],['skip','⏩','บัตรข้ามเวลาพัก','ข้ามเวลาพักของมินิเกมทันที',100],['luck','🎰','บัตรสุ่มโชค','สุ่มรับ 0-1,000 เหรียญ',200],['gx2','💰','บัตรเหรียญมินิเกม ×2','เหรียญจากมินิเกมครั้งถัดไป ×2 (ยกเว้นล่ากระดาษ)',300],['map','🧭','แผนที่สมบัติ','เผยโค้ดลับที่ยังไม่ได้ใช้ 1 ชุด',1200],['debt','🩹','บัตรล้างหนี้','ล้างยอดเหรียญติดลบให้เป็น 0 (ใช้ได้ตอนติดหนี้)',500],['post','📮','บัตรโพสต์ฟรี','ใช้แทนค่าโพสต์ตอนเขียนโพสต์ 1 ครั้ง',8000]];
+function buyCard(i){const u=U(),c=CARDS[i];if(!payFor('card:'+c[0],c[4]))return;u.cards=u.cards||{};u.cards[c[0]]=(u.cards[c[0]]||0)+1;trophy('นักสะสมบัตร');sv();toast('🎴 ได้ '+c[2]+' 1 ใบ');render()}
+function useCard(id){
+ const u=U();u.cards=u.cards||{};u.fx=u.fx||{};
+ if(!u.cards[id])return;
+ const use=()=>{u.cards[id]--};
+ if(id==='shield'||id==='x2'||id==='gx2'){if(u.fx[id])return toast('เอฟเฟกต์นี้เปิดอยู่แล้ว');use();u.fx[id]=1;toast(id==='gx2'?'เปิดใช้งานแล้ว! เหรียญจากมินิเกมครั้งถัดไป ×2':'เปิดใช้งานแล้ว! จะทำงานตอนแลกโค้ดครั้งถัดไป')}
+ else if(id==='map'){const c=pickMini();if(!c)return toast('ไม่มีโค้ดลับเหลือให้ค้นหา (ไม่เสียบัตร)');use();toast('🧭 พบโค้ดลับแล้ว! ดูได้ในส่วน "โค้ดที่ค้นพบ" ด้านล่าง')}
+ else if(id==='debt'){if(u.coins>=0)return toast('คุณไม่ได้ติดหนี้ (ไม่เสียบัตร)');use();u.coins=0;toast('🩹 ล้างหนี้เรียบร้อย')}
+ else if(id==='post')return toast('ใช้ตอนเขียนโพสต์: เลือก "จ่ายด้วยบัตร" ในฟอร์มโพสต์');
+ else if(id==='skip'){if((u.cd||0)<=Date.now())return toast('ตอนนี้ไม่ต้องพัก ยังไม่ต้องใช้บัตร');use();u.cd=0;toast('⏩ ข้ามเวลาพักแล้ว เล่นมินิเกมได้เลย')}
+ else if(id==='luck'){use();const r=Math.random(),g=r<.3?0:r<.6?100:r<.8?200:r<.95?400:1000;u.coins+=g;toast(g?`🎰 โชคดี! ได้ +${g} 🪙`:'🎰 โชคร้าย ไม่ได้อะไรเลย')}
+ else if(id==='scan'){const c=($('scan-in').value||'').trim().toUpperCase();if(!c)return toast('พิมพ์รหัสที่ต้องการตรวจก่อน');const d=db.codes[c];if(!d)return toast('ไม่พบรหัสนี้ (ไม่เสียบัตร)');use();toast(d.trap?`⚠️ ${c} คือรหัสกับดัก! อย่าใช้`:`✅ ${c} ปลอดภัย ใช้ได้`)}
+ sv();render();
+}
+const EXPS=[['10 นาที',600000,60],['30 นาที',1800000,200],['2 ชั่วโมง',7200000,900]];
+const ymd=d=>d.toLocaleDateString('en-CA');
+const yday=()=>{const y=new Date();y.setDate(y.getDate()-1);return ymd(y)};
+const fmtT=s=>{const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return (h?h+':':'')+String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+setInterval(()=>{if(me&&U()&&tab==='earn'&&U().exp&&U().exp.end>Date.now()-1100)render()},1000);
+function vEarn(){
+ const u=U(),dl=u.dl||{last:'',streak:0},got=dl.last===ymd(new Date());
+ const cur=got||dl.last===yday()?dl.streak:0,next=got?cur:cur+1,ex=u.exp,left=ex?Math.ceil((ex.end-Date.now())/1000):0;
+ return `<div class="space-y-4 max-w-xl mx-auto">
+ <div class="card"><h3 class="font-bold mb-1">📅 เช็กอินรายวัน</h3><p class="text-xs text-gray-600 mb-2">เช็กอินติดต่อกันได้เหรียญเพิ่มขึ้น (วันที่ 1 = 50 สูงสุด 170 ที่วันที่ 7) และได้ 🔑1 กับ 🎫1 ทุกครบ 7 วัน ขาดวันใดวันหนึ่งนับใหม่</p>
+ <div class="grid grid-cols-7 gap-1 mb-2 text-center text-[11px]">${[1,2,3,4,5,6,7].map(d=>`<div class="rounded-lg py-1 ${d<=(cur%7||(cur?7:0))?'bg-vgold/50 font-bold':'bg-p1'}">${d}${d===7?'🔑🎫':''}</div>`).join('')}</div>
+ <button onclick="checkin()" ${got?'disabled':''} class="btn w-full bg-vgold text-p9 disabled:bg-gray-300">${got?'✅ เช็กอินวันนี้แล้ว (ติดต่อกัน '+cur+' วัน)':`🎁 รับรางวัลวันที่ ${next} (+${50+20*(Math.min(next,7)-1)}🪙${next%7===0?' +1🔑 +1🎫':''})`}</button></div>
+ <div class="card"><h3 class="font-bold mb-1">⛏️ ส่งนักสำรวจ</h3><p class="text-xs text-gray-600 mb-2">ส่งไปหาสมบัติ ปิดเกมไว้ก็ได้ กลับมาเก็บเหรียญเมื่อครบเวลา ยิ่งนานยิ่งคุ้ม (ส่งได้ทีละทริป)</p>
+ ${ex?(left>0?`<p class="text-center text-sm">🧭 นักสำรวจกำลังเดินทาง... เหลือ <b>${fmtT(left)}</b> (จะได้ 🪙${ex.r})</p>`:`<button onclick="claimExp()" class="btn w-full bg-green-600 text-white">🎉 รับสมบัติ +${ex.r}🪙</button>`):`<div class="grid grid-cols-3 gap-2">${EXPS.map((e,i)=>`<button onclick="startExp(${i})" class="btn bg-p1 hover:bg-p2 text-center"><div>${e[0]}</div><div class="text-vgold">🪙${e[2]}</div></button>`).join('')}</div>`}</div></div>`;
+}
+function checkin(){
+ const u=U(),today=ymd(new Date()),dl=u.dl||{last:'',streak:0};
+ if(dl.last===today)return toast('เช็กอินวันนี้แล้ว');
+ const st=dl.last===yday()?dl.streak+1:1,c=50+20*(Math.min(st,7)-1),k=st%7===0?1:0;
+ u.coins+=c;u.keys+=k;u.certs=(u.certs||0)+k;bump('ci');u.dl={last:today,streak:st};trophy('เช็กอินประจำ');if(st>=7)trophy('เช็กอินครบสัปดาห์');
+ sv();toast(`📅 เช็กอินวันที่ ${st}: +${c}🪙${k?' +1🔑 +1🎫':''}`);render();
+}
+function startExp(i){const u=U();if(u.exp)return;const e=EXPS[i];u.exp={end:Date.now()+e[1],r:e[2]};sv();toast('🧭 ส่งนักสำรวจออกเดินทางแล้ว');render()}
+function claimExp(){const u=U();if(!u.exp||u.exp.end>Date.now())return;u.coins+=u.exp.r;toast(`🎉 นักสำรวจกลับมาพร้อมสมบัติ +${u.exp.r}🪙`);u.exp=null;trophy('นักสำรวจสมบัติ');sv();render()}
+let uiPref=(()=>{try{return JSON.parse(localStorage.getItem('pch-ui'))||{}}catch(e){return{}}})();
+const lum=c=>{const n=parseInt(String(c).slice(1),16);return (0.299*(n>>16&255)+0.587*(n>>8&255)+0.114*(n&255))/255};
+function applyUi(){const r=document.documentElement,st=r.style;
+ if(uiPref.ink){const l=lum(uiPref.ink);if(l>.6)uiPref.theme='dark';else if(l<.45&&uiPref.theme==='dark')uiPref.theme='light'}
+ r.dataset.theme=uiPref.theme||'light';
+ if(uiPref.ink){st.setProperty('--ink',uiPref.ink);st.setProperty('--inink',uiPref.ink);st.setProperty('--inbg',lum(uiPref.ink)>.6?'#2b2418':'#fff')}
+ else['--ink','--inink','--inbg'].forEach(k=>st.removeProperty(k))}
+function saveUi(){try{localStorage.setItem('pch-ui',JSON.stringify(uiPref))}catch(e){}applyUi()}
+function toggleUi(){$('ui-panel').classList.toggle('hidden')}
+function setTheme(t){uiPref.theme=t;uiPref.ink=null;saveUi()}
+function setInk(c){uiPref.ink=c;saveUi()}
+function resetInk(){uiPref.ink=null;saveUi()}
+applyUi();
+function catsPanel(){
+ const cats=db.cats||[];
+ return `<p class="text-xs text-gray-600">สร้างหมวดเพื่อจัดกลุ่มโค้ด ผู้เล่นจะใช้ได้เพียง <b>1 โค้ดต่อหมวด</b> (นับรวมโค้ดกับดักด้วย)</p>
+ <div class="flex gap-2 mt-3"><input id="cat-name" maxlength="20" placeholder="ชื่อหมวด เช่น yah" class="${fld}"><button onclick="addCat()" class="btn bg-purple-700 text-white whitespace-nowrap">➕ เพิ่มหมวด</button></div>
+ <div class="mt-4 space-y-2">${cats.map(c=>{const cs=Object.keys(db.codes).filter(k=>db.codes[k].cat===c);return `<div class="bg-p1 rounded-xl p-2"><div class="flex justify-between items-center"><b>📂 ${esc(c)} <span class="text-xs font-normal">(${cs.length} โค้ด)</span></b><button onclick="delCat('${esc(c)}')" class="text-vred text-xs">🗑️ ลบหมวด</button></div><div class="text-xs font-mono mt-1">${cs.length?cs.map(esc).join(', '):'<i class="text-gray-500">ยังไม่มีโค้ดในหมวดนี้</i>'}</div></div>`}).join('')||'<i class="text-xs text-gray-500">ยังไม่มีหมวด</i>'}</div>`;
+}
+function addCat(){
+ if(!isAdm())return;
+ const n=$('cat-name').value.replace(/['"\\<>&`$]/g,'').trim();
+ if(!n)return toast('ใส่ชื่อหมวดก่อน');
+ db.cats=db.cats||[];if(db.cats.includes(n))return toast('มีหมวดนี้แล้ว');
+ db.cats.push(n);sv();toast('📂 เพิ่มหมวด '+n+' แล้ว');drawCreator();
+}
+function delCat(c){if(!isAdm())return;db.cats=(db.cats||[]).filter(x=>x!==c);Object.values(db.codes).forEach(d=>{if(d.cat===c)delete d.cat});sv();toast('ลบหมวดแล้ว (โค้ดในหมวดกลายเป็นไม่มีหมวด)');drawCreator()}
+function setCodeCat(c,v){if(!isAdm()||!db.codes[c])return;if(v)db.codes[c].cat=v;else delete db.codes[c].cat;sv();drawCreator()}
+const expT=d=>{if(!d.exp)return '';const l=d.exp-Date.now();if(l<=0)return ' <span class="text-vred">⌛หมดอายุแล้ว</span>';const m=Math.ceil(l/60000);return ' ⏳เหลือ '+(m>=1440?Math.floor(m/1440)+' วัน':m>=60?Math.floor(m/60)+' ชม.':m+' นาที')};
+function setCodeExp(c,v){if(!isAdm()||!db.codes[c]||!v)return;if(v==='none')delete db.codes[c].exp;else db.codes[c].exp=Date.now()+({h1:3600000,h6:21600000,d1:86400000,d7:604800000}[v]);sv();toast('⏳ ตั้งอายุโค้ดแล้ว');drawCreator()}
+let chatRoom=null,chatPeers=[],chatOn=false,chatLog=[],unread=0,lastSend=0,tutI=-1,lastPres='';
+const PLAY_RULES=['โค้ดหนึ่งชุดแลกได้ <b>ครั้งเดียว</b>ต่อผู้เล่น และบางโค้ดมีวันหมดอายุ','โค้ดที่อยู่ <b>หมวดเดียวกัน</b> ใช้ได้เพียง 1 โค้ดต่อหมวด (นับรวมโค้ดกับดัก)','โค้ดกับดักหักของจริง เหรียญติดลบได้ และระหว่างติดลบจะซื้อของไม่ได้','มินิเกมต้องพัก <b>5 นาที</b> หลังจบแต่ละเกม',' เกมเปิดตู้เซฟต้องใช้ 🎫 บัตรรับรอง 1 ใบต่อรอบ (ใช้แล้วไม่คืนถ้าแพ้ ชนะมีโอกาส 50% ได้บัตรคืน)','คอมเมนต์ใช้ 🔑1 ต่อครั้ง · เขียนโพสต์ใช้ 🔑80 หรือ 🪙10,000 · แต่ละโพสต์รับคอมเมนต์จากผู้อื่นได้ 50 (ขยายเป็น 70 ได้ด้วย 🪙3,000)','สินค้าที่มี +🎫 ต้องใช้บัตรรับรองควบคู่กับเหรียญ','เล่นอย่างยุติธรรม ไม่แก้ข้อมูลในเครื่องหรือหาช่องโหว่เพื่อเอาเปรียบผู้อื่น'];
+const CHAT_RULES=['พูดจาสุภาพ ไม่ด่าทอ ไม่เหยียด ไม่คุกคามผู้อื่น','ห้ามสแปมหรือส่งข้อความซ้ำๆ (ระบบจำกัด 1 ข้อความต่อ 1.5 วินาที ยาวสุด 200 ตัวอักษร)','ห้ามเปิดเผยข้อมูลส่วนตัว เช่น เบอร์โทร อีเมล ที่อยู่ ของตัวเองหรือผู้อื่น','ห้ามแอบอ้างเป็นผู้สร้างหรือทีมงาน','ถ้ามีคนรบกวน กด 🚫 ข้างชื่อเพื่อบล็อกได้','แชตสดไม่เก็บย้อนหลัง คนที่เข้ามาทีหลังจะไม่เห็นข้อความเก่า'];
+const rulesList=a=>`<ol class="list-decimal pl-5 space-y-1 text-sm">${a.map(r=>`<li>${r}</li>`).join('')}</ol>`;
+const TUT=[
+{i:'👋',t:'ยินดีต้อนรับสู่ Paper Code Hunter',b:'เป้าหมาย: ตามหา <b>โค้ดลับ</b> สะสม 🪙 เหรียญ 🔑 กุญแจ และ 🎫 บัตรรับรอง แล้วเอาไปแต่งตัวละคร ยอดของคุณแสดงที่มุมขวาบนเสมอ'},
+{tab:'news',i:'📰',t:'ข่าวสาร',b:'อ่านประกาศ คำใบ้ และเตือนภัยรหัสกับดัก คอมเมนต์ใช้ 🔑1 ต่อครั้ง ผู้เล่นเขียนโพสต์เองได้ (🔑80 หรือ 🪙10,000) ปิดคอมเมนต์ได้ และแต่ละโพสต์รับคอมเมนต์ได้ 50 อัน'},
+{tab:'redeem',i:'🔑',t:'ถอดรหัส',b:'พิมพ์โค้ดเพื่อรับรางวัล ลองพิมพ์ <b>PAPER2026</b> ดู โค้ดใช้ได้ครั้งเดียว ระวัง <b>รหัสกับดัก</b> ที่ทำให้เสียของและติดลบได้!'},
+{tab:'shop',i:'🛒',t:'ร้านค้า',b:'ซื้อกุญแจ (ดอกละ 🪙300) อวตาร์ กรอบรูป ฉายา และบัตรพิเศษ สินค้าที่มี <b>+🎫</b> ต้องใช้บัตรรับรองด้วย'},
+{tab:'avatar',i:'👔',t:'อวตาร์',b:'เลือกสวมอวตาร์ กรอบรูป และฉายาที่คุณซื้อไว้ ดูตัวอย่างโปรไฟล์ได้ที่นี่'},
+{tab:'game',i:'🎮',t:'มินิเกม',b:'มี 7 เกมให้หาเหรียญ (เกมเปิดตู้เซฟยากสุด ต้องใช้ 🎫 บัตรรับรอง) เล่นถึงเป้าหมายจะ <b>เจอโค้ดลับ</b> และมีโอกาสได้ 🎫 หลังจบแต่ละเกมต้องพัก 5 นาที'},
+{tab:'earn',i:'💼',t:'หาเหรียญ',b:'<b>เช็กอินรายวัน</b> ยิ่งติดต่อกันยิ่งได้มาก ครบ 7 วันได้ 🔑 กับ 🎫 และ <b>ส่งนักสำรวจ</b> ไปหาสมบัติ ปิดเกมไว้ก็ได้'},
+{tab:'mission',i:'🎯',t:'ภารกิจ',b:'ทำภารกิจ เช่น ใช้โค้ดครบจำนวน เล่นมินิเกมครบครั้ง แล้วกดรับรางวัล ซึ่งมี 🎫 บัตรรับรองรวมอยู่'},
+{tab:'inv',i:'🎒',t:'คลัง',b:'ดูของทั้งหมด กดใช้บัตรพิเศษ เช่น 🛡️ กันกับดัก ✨ รางวัล ×2 และดู <b>โค้ดที่ค้นพบ</b> ที่ยังไม่ได้ใช้'},
+{tab:'chat',i:'💬',t:'แชตรวม',b:'คุยกับผู้เล่นคนอื่นแบบสด ต้องอ่านและยอมรับกฎแชตก่อนเข้าครั้งแรก แชตไม่เก็บย้อนหลัง'},
+{tab:'rules',i:'📜',t:'กฎและวิธีเล่น',b:'สรุปกฎทั้งหมดอยู่ที่นี่ กดปุ่ม 📖 มุมขวาบนเพื่อเปิดสอนเล่นอีกครั้งได้ทุกเมื่อ ขอให้สนุกกับการล่าโค้ด!'}];
+function startTut(){tutI=0;showTut()}
+function hideTut(){tutI=-1;const t=$('tut');if(t)t.classList.add('hidden');document.body.style.paddingBottom='';document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('ring-4','ring-purple-400'))}
+function endTut(){if(me&&U()){U().tutDone=1;sv()}hideTut()}
+function tutGo(d){tutI+=d;if(tutI>=TUT.length)return endTut();showTut()}
+function showTut(){
+ const s=TUT[tutI];if(!s)return hideTut();
+ if(s.tab&&tab!==s.tab)setTab(s.tab);
+ document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('ring-4','ring-purple-400'));
+ const b=s.tab&&$('tb-'+s.tab);if(b)b.classList.add('ring-4','ring-purple-400');
+ $('tut').innerHTML=`<div class="sheet rounded-2xl border-2 border-purple-500 p-4 max-w-xl mx-auto shadow-2xl"><div class="flex justify-between text-xs mb-1"><span>📖 สอนเล่น ${tutI+1}/${TUT.length}</span><button onclick="endTut()" class="underline">ข้ามทั้งหมด</button></div><h3 class="font-bold text-lg mb-1">${s.i} ${s.t}</h3><p class="text-sm mb-3">${s.b}</p><div class="flex gap-2">${tutI>0?'<button onclick="tutGo(-1)" class="btn flex-1" style="background:#EFE9D5;color:#2C2216">◀ ย้อน</button>':''}<button onclick="tutGo(1)" class="btn flex-1 bg-purple-700 text-white">${tutI===TUT.length-1?'🎉 เสร็จสิ้น':'ถัดไป ▶'}</button></div></div>`;
+ $('tut').classList.remove('hidden');document.body.style.paddingBottom='260px';
+}
+function vRules(){
+ return `<div class="max-w-xl mx-auto space-y-4"><div class="text-center"><div class="text-4xl">📜</div><h2 class="text-xl font-bold">กฎและวิธีเล่น</h2><button onclick="startTut()" class="btn bg-vgold text-p9 mt-2 py-2 px-5">▶️ เริ่มสอนเล่น (${TUT.length} ขั้นตอน)</button></div><div class="card"><h3 class="font-bold mb-2">🎮 กฎการเล่น</h3>${rulesList(PLAY_RULES)}</div><div class="card"><h3 class="font-bold mb-2">💬 กฎแชตและโพสต์</h3>${rulesList(CHAT_RULES)}</div></div>`;
+}
+async function initRoom(){
+ try{
+  if(!window.claude||!claude.use)return;
+  const r=await claude.use('room');if(!r)return;
+  chatRoom=r;chatOn=r.connected();
+  r.on('chat',onChatMsg);
+  r.onPeers(ch=>{chatPeers=ch.peers;if(tab==='chat')drawOnline()});
+  r.onConnection(c=>{chatOn=c;if(tab==='chat')drawChatStatus()});
+  chatPresence();
+  if(tab==='chat'&&me)chatMount();
+ }catch(e){}
+}
+function chatPresence(){
+ if(!chatRoom||!me||!U())return;
+ const k=me+'|'+U().av;if(k===lastPres)return;lastPres=k;
+ chatRoom.presence({n:me,av:U().av}).catch(()=>{lastPres=''});
+}
+function onChatMsg(m){
+ const d=m.data;if(!d||typeof d.t!=='string'||typeof d.n!=='string')return;
+ const x={n:d.n.slice(0,14),t:d.t.slice(0,200),av:String(d.av||'👤').slice(0,4),ts:Date.now(),me:!!m.isMe};
+ if(!x.me&&me&&U()&&(U().blk||[]).includes(x.n))return;
+ chatLog.push(x);if(chatLog.length>100)chatLog.shift();
+ if(tab==='chat'&&me&&$('chatbox'))addChatDom(x);else if(!x.me){unread++;badge()}
+}
+function badge(){const b=$('tb-chat');if(b)b.textContent=b.dataset.l+(unread>0?` (${unread})`:'')}
+function msgHtml(x){
+ return `<div class="flex ${x.me?'justify-end':''}"><div class="max-w-[85%] rounded-2xl px-3 py-1 ${x.me?'bg-vgold/40':'bg-white border border-p3'}"><div class="text-[11px] text-gray-500">${esc(x.av)} <b>${esc(x.n)}</b> · ${new Date(x.ts).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})}${x.me?'':` <button data-n="${esc(x.n)}" onclick="blockName(this.dataset.n)" title="บล็อก">🚫</button>`}</div><div class="text-sm break-words">${esc(x.t)}</div></div></div>`;
+}
+function addChatDom(x){const b=$('chatbox');if(!b)return;const e=$('chat-empty');if(e)e.remove();b.insertAdjacentHTML('beforeend',msgHtml(x));b.scrollTop=b.scrollHeight}
+function drawChatStatus(){const s=$('chat-status');if(!s)return;s.textContent=chatRoom?(chatOn?'🟢 เชื่อมต่อแล้ว':'🟡 กำลังเชื่อมต่อ...'):net.want?(net.ok?'🟢 ห้อง "'+net.room+'" เชื่อมต่อแล้ว':'🟡 กำลังเชื่อมต่อห้องเพื่อน...'):'⚪ ยังไม่ได้เข้าห้อง (ใส่รหัสห้องด้านล่างเพื่อคุยกับเพื่อน)'}
+function drawOnline(){
+ const el=$('chat-online');if(!el)return;
+ const names=chatRoom?[...new Set(chatPeers.filter(p=>p.kind==='viewer'&&p.presence&&typeof p.presence.n==='string').map(p=>p.presence.n.slice(0,14)))]:netNames();
+ el.innerHTML=names.length?`🟢 ออนไลน์ ${names.length} คน: ${names.slice(0,12).map(esc).join(', ')}${names.length>12?' ...':''}`:'ยังไม่เห็นผู้เล่นออนไลน์';
+}
+function chatMount(){
+ if(!U().rulesOk)return;
+ const b=$('chatbox');if(!b)return;
+ const blk=U().blk||[];
+ b.innerHTML=chatLog.filter(x=>x.me||!blk.includes(x.n)).map(msgHtml).join('')||'<p id="chat-empty" class="text-center text-xs text-gray-500 py-10">ยังไม่มีข้อความ ลองทักทายดู 👋</p>';
+ b.scrollTop=b.scrollHeight;drawChatStatus();drawOnline();
+}
+function vChat(){
+ const u=U();
+ if(!u.rulesOk)return `<div class="max-w-xl mx-auto"><h2 class="text-xl font-bold mb-2">💬 แชตรวม</h2><p class="text-sm mb-2">ก่อนเข้าแชต โปรดอ่านและยอมรับกฎ:</p><div class="card">${rulesList(CHAT_RULES)}</div><button onclick="acceptRules()" class="btn w-full bg-vgold text-p9 py-2 mt-3">✅ ฉันอ่านกฎแล้ว เข้าแชตเลย</button></div>`;
+ return `<div class="max-w-2xl mx-auto"><div class="flex items-center justify-between mb-1"><h2 class="text-xl font-bold">💬 แชตรวม</h2><span id="chat-status" class="text-xs"></span></div><div id="chat-online" class="text-xs text-gray-600 mb-2"></div>${chatRoom?'':netPanel()}<div id="chatbox" class="h-[360px] overflow-y-auto space-y-2 p-2 bg-p1 rounded-xl mb-2"></div><div class="flex gap-2"><input id="chat-msg" maxlength="200" placeholder="พิมพ์ข้อความ..." onkeydown="if(event.key==='Enter')sendChatMsg()" class="flex-1 px-3 py-2 text-sm rounded-xl border border-p3"><button onclick="sendChatMsg()" class="btn bg-vgold text-p9">ส่ง ✉️</button></div><p class="text-[11px] text-gray-500 mt-2">แชตสดไม่เก็บย้อนหลัง · กฎดูได้ที่แท็บ 📜 · กด 🚫 ข้างชื่อเพื่อบล็อกคนที่รบกวน${(u.blk||[]).length?` · <button class="underline" onclick="clearBlk()">ล้างรายชื่อที่บล็อก (${u.blk.length})</button>`:''}</p></div>`;
+}
+function acceptRules(){U().rulesOk=1;sv();render()}
+function blockName(n){const u=U();u.blk=u.blk||[];if(!u.blk.includes(n))u.blk.push(n);sv();toast('🚫 บล็อก '+n+' แล้ว');chatMount()}
+function clearBlk(){U().blk=[];sv();render()}
+function sendChatMsg(){
+ const i=$('chat-msg');if(!i)return;
+ const t=i.value.replace(/\s+/g,' ').trim();if(!t)return;
+ if(!chatRoom){if(!net.ok)return toast('ยังไม่ได้เข้าห้องเพื่อน หรือยังเชื่อมต่อไม่สำเร็จ');if(Date.now()-lastSend<1500)return toast('ส่งเร็วเกินไป รอสักครู่ (กฎ: 1 ข้อความ / 1.5 วินาที)');lastSend=Date.now();netSendObj({k:'m',id:net.id,n:me,av:U().av,t:t.slice(0,200)}).then(()=>{i.value=''});return}
+ if(Date.now()-lastSend<1500)return toast('ส่งเร็วเกินไป รอสักครู่ (กฎ: 1 ข้อความ / 1.5 วินาที)');
+ lastSend=Date.now();
+ chatRoom.emit('chat',{n:me,av:U().av,t:t.slice(0,200)}).then(()=>{i.value=''}).catch(e=>toast(e&&e.code==='not_permitted'?'บัญชีของคุณส่งข้อความไม่ได้ (ต้องมีสิทธิ์ผู้ร่วมเขียนขึ้นไป)':'ส่งไม่สำเร็จ ลองใหม่อีกครั้ง'));
+}
+const _rgb=s=>{const m=String(s).match(/[\d.]+/g)||[0,0,0,1];return{r:+m[0],g:+m[1],b:+m[2],a:m[3]===undefined?1:+m[3]}};
+const _lum=c=>{const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(c.r)+.7152*f(c.g)+.0722*f(c.b)};
+function fixInk(t){
+ if(!t||!t.tagName||!/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||['checkbox','radio','color','button','range'].includes(t.type))return;
+ const cs=getComputedStyle(t),fg=_rgb(cs.webkitTextFillColor||cs.color),bg=_rgb(cs.backgroundColor),dark=document.documentElement.dataset.theme==='dark';
+ const bl=bg.a<.5?(dark?.02:1):_lum(bg),fl=_lum(fg),r=(Math.max(fl,bl)+.05)/(Math.min(fl,bl)+.05);
+ if(fg.a<.9||r<4.5){const B=dark?'#2b2418':'#ffffff',F=dark?'#f3ecd8':'#1a1a1a';t.style.setProperty('background-color',B,'important');t.style.setProperty('color',F,'important');t.style.setProperty('-webkit-text-fill-color',F,'important')}
+}
+['focusin','input'].forEach(ev=>document.addEventListener(ev,e=>fixInk(e.target),true));
+const BROKERS=['wss://broker.hivemq.com:8884/mqtt','wss://broker.emqx.io:8084/mqtt','wss://test.mosquitto.org:8081'];
+const net={ws:null,ok:false,want:false,room:'',key:null,topic:'',bi:0,peers:{},id:Math.random().toString(36).slice(2,10),t1:0,t2:0,rt:0,buf:new Uint8Array(0)};
+const _enc=new TextEncoder(),_dec=new TextDecoder();
+const _hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+function mqttLen(n){const o=[];do{let d=n%128;n=Math.floor(n/128);if(n>0)d|=128;o.push(d)}while(n>0);return o}
+function mqttStr(s){const b=_enc.encode(s);return [b.length>>8,b.length&255,...b]}
+function mqttPkt(h,body){return new Uint8Array([h,...mqttLen(body.length),...body])}
+function netStop(){net.want=false;clearTimeout(net.rt);clearInterval(net.t1);clearInterval(net.t2);const w=net.ws;net.ws=null;net.ok=false;net.peers={};if(w){try{w.close()}catch(e){}}}
+function netLeave(){netStop();net.room='';if(me&&U()){delete U().room;sv()}if(tab==='chat')render()}
+async function netJoin(code){
+ code=String(code||'').trim().toLowerCase();
+ if(code.length<4)return toast('รหัสห้องต้องยาวอย่างน้อย 4 ตัวอักษร');
+ netStop();
+ const km=await crypto.subtle.importKey('raw',_enc.encode(code),'PBKDF2',false,['deriveKey']);
+ net.key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:_enc.encode('pch-chat-v1'),iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+ net.topic='pch1/'+_hex(await crypto.subtle.digest('SHA-256',_enc.encode('topic:'+code))).slice(0,24);
+ net.room=code;net.want=true;net.peers={};
+ if(me&&U()){U().room=code;sv()}
+ netConnect();if(tab==='chat')render();
+}
+function autoRoom(){if(!chatRoom&&me&&U()&&U().room&&!net.want)netJoin(U().room)}
+function netConnect(){
+ if(!net.want)return;
+ const urls=window.__brokers||BROKERS,url=urls[net.bi%urls.length];
+ let ws;try{ws=new WebSocket(url,'mqtt')}catch(e){return netRetry()}
+ ws.binaryType='arraybuffer';net.ws=ws;net.buf=new Uint8Array(0);
+ ws.onopen=()=>ws.send(mqttPkt(0x10,[...mqttStr('MQTT'),4,2,0,30,...mqttStr('pch'+net.id)]));
+ ws.onmessage=e=>netData(ws,new Uint8Array(e.data));
+ ws.onclose=()=>{if(net.ws!==ws)return;net.ok=false;clearInterval(net.t1);clearInterval(net.t2);if(tab==='chat')drawChatStatus();netRetry()};
+ ws.onerror=()=>{};
+}
+function netRetry(){if(!net.want)return;net.bi++;clearTimeout(net.rt);net.rt=setTimeout(netConnect,3000)}
+function netData(ws,u){
+ const b=new Uint8Array(net.buf.length+u.length);b.set(net.buf);b.set(u,net.buf.length);net.buf=b;
+ while(net.buf.length>=2){
+  let i=1,mul=1,len=0,d;
+  do{if(i>=net.buf.length)return;d=net.buf[i++];len+=(d&127)*mul;mul*=128}while(d&128);
+  if(net.buf.length<i+len)return;
+  const type=net.buf[0]>>4,body=net.buf.slice(i,i+len);net.buf=net.buf.slice(i+len);
+  if(type===2){if(body[1]===0)ws.send(mqttPkt(0x82,[0,1,...mqttStr(net.topic),0]));else ws.close()}
+  else if(type===9){net.ok=true;if(tab==='chat'){drawChatStatus();drawOnline()}clearInterval(net.t1);clearInterval(net.t2);net.t1=setInterval(()=>{if(ws.readyState===1)ws.send(new Uint8Array([0xC0,0]))},20000);netHello();net.t2=setInterval(netHello,15000)}
+  else if(type===3){const tl=(body[0]<<8)|body[1];netMsg(body.slice(2+tl))}
+ }
+}
+async function netSendObj(o){
+ if(!net.ok||!net.key||!net.ws||net.ws.readyState!==1)return false;
+ const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},net.key,_enc.encode(JSON.stringify(o))));
+ const pl=new Uint8Array(12+ct.length);pl.set(iv);pl.set(ct,12);
+ net.ws.send(mqttPkt(0x30,[...mqttStr(net.topic),...pl]));return true;
+}
+async function netMsg(pl){
+ try{
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:pl.slice(0,12)},net.key,pl.slice(12)),o=JSON.parse(_dec.decode(pt));
+  if(o.k==='h'){net.peers[o.id]={n:String(o.n).slice(0,14),ts:Date.now()};if(tab==='chat')drawOnline()}
+  else if(o.k==='m'&&typeof o.t==='string')onChatMsg({data:{n:String(o.n),av:o.av,t:o.t},isMe:o.id===net.id});
+ }catch(e){}
+}
+function netHello(){if(me&&U())netSendObj({k:'h',id:net.id,n:me})}
+const netNames=()=>[...new Set([me,...Object.values(net.peers).filter(p=>Date.now()-p.ts<40000).map(p=>p.n)].filter(Boolean))];
+function netPanel(){
+ if(net.want)return `<div class="card mb-2 text-xs">👥 ห้องเพื่อน: <b>${esc(net.room)}</b> · <button onclick="netLeave()" class="underline">ออกจากห้อง</button></div>`;
+ return `<div class="card mb-2"><b class="text-sm">👥 เล่นกับเพื่อน</b><p class="text-[11px] text-gray-600 my-1">ตั้ง <b>รหัสห้อง</b> เดียวกันกับเพื่อน (อย่างน้อย 4 ตัว ควรเดายาก) แล้วคุยกันได้ทันที ข้อความถูกเข้ารหัสด้วยรหัสห้องก่อนส่ง · ใช้เซิร์ฟเวอร์สาธารณะฟรี อาจช้าหรือล่มได้</p><div class="flex gap-2"><input id="room-in" maxlength="30" placeholder="เช่น lak-yah-2026" class="flex-1 px-3 py-2 text-sm rounded-xl border border-p3"><button onclick="netJoin($('room-in').value)" class="btn bg-vblue text-white">เข้าห้อง</button></div></div>`;
+}
+function equip(k,v){U()[k]=v;sv();chatPresence();render()}
+function vAvatar(){
+ const u=U();
+ return `<div class="grid md:grid-cols-3 gap-4"><div class="card text-center py-6"><div class="w-28 h-28 mx-auto rounded-2xl flex items-center justify-center bg-white text-6xl f-${u.fr}">${u.av}</div>
+ <div class="mt-3 inline-block px-3 py-0.5 text-xs font-bold rounded-full border border-vgold text-vgold bg-vgold/10">[${esc(u.title)}]</div><h4 class="text-xl font-bold">${esc(me)}</h4><div class="text-sm font-bold">🪙${u.coins} 🔑${u.keys}</div></div>
+ <div class="md:col-span-2 space-y-3"><div class="card"><b class="text-sm">อวตาร์</b><div class="flex flex-wrap gap-2 mt-2">${u.avs.map(a=>`<button onclick="equip('av','${a}')" class="text-3xl p-1 rounded-xl ${u.av===a?'bg-vgold/40':'bg-p1'}">${a}</button>`).join('')}</div></div>
+ <div class="card"><b class="text-sm">กรอบรูป</b><div class="flex flex-wrap gap-2 mt-2">${u.frs.map(a=>`<button onclick="equip('fr','${a}')" class="w-12 h-12 rounded-xl bg-white f-${a} ${u.fr===a?'ring-2 ring-vgold ring-offset-2':''}"></button>`).join('')}</div></div>
+ <div class="card"><b class="text-sm">ฉายา</b><div class="flex flex-wrap gap-2 mt-2">${u.tts.map(a=>`<button onclick="equip('title','${a}')" class="btn ${u.title===a?'bg-vgold text-p9':'bg-p1'}">${esc(a)}</button>`).join('')}</div></div></div></div>`;
+}
+function vFriends(){
+ const u=U();
+ return `<div class="grid md:grid-cols-3 gap-4"><div class="card h-[460px] flex flex-col"><b class="text-sm border-b pb-2 mb-2">👥 เพื่อน (${u.friends.length})</b>
+ <div class="flex gap-2 mb-2"><input id="fr-in" placeholder="ชื่อผู้ใช้..." class="flex-1 px-2 py-1 text-xs rounded-lg border border-p3"><button onclick="addFriend()" class="btn bg-vblue text-white">+</button></div>
+ <div class="flex-1 overflow-y-auto space-y-1">${u.friends.map(f=>`<button onclick="chatWith='${esc(f)}';render()" class="w-full text-left px-2 py-1.5 rounded-lg text-sm ${chatWith===f?'bg-vgold/30':'bg-p1'}">${db.users[f]?db.users[f].av:'🤖'} ${esc(f)}</button>`).join('')||'<p class="text-xs text-gray-500 italic">ยังไม่มีเพื่อน</p>'}</div></div>
+ <div class="md:col-span-2 card bg-p1 h-[460px] flex flex-col"><b class="text-sm border-b pb-2 mb-2">${chatWith?'💬 '+esc(chatWith):'เลือกเพื่อนเพื่อเริ่มสนทนา'}</b>
+ <div id="msgs" class="flex-1 overflow-y-auto space-y-2 p-2 bg-white/60 rounded-xl mb-2">${chatWith?(u.chats[chatWith]||[]).map(m=>`<div class="flex ${m.me?'justify-end':''}"><span class="px-3 py-1 rounded-2xl text-sm max-w-[80%] ${m.me?'bg-vgold/60':'bg-white border border-p3'}">${esc(m.t)}</span></div>`).join(''):''}</div>
+ <div class="flex gap-2"><input id="chat-in" ${chatWith?'':'disabled'} onkeydown="if(event.key==='Enter')sendChat()" placeholder="พิมพ์ข้อความ..." class="flex-1 px-3 py-2 text-sm rounded-xl border border-p3 disabled:bg-gray-100"><button ${chatWith?'':'disabled'} onclick="sendChat()" class="btn bg-vgold text-p9 disabled:bg-gray-300">ส่ง ✉️</button></div></div></div>`;
+}
+function bindChat(){const m=$('msgs');if(m)m.scrollTop=m.scrollHeight}
+function addFriend(){
+ const n=$('fr-in').value.trim(),u=U();
+ if(!n)return;if(n===me)return toast('เพิ่มตัวเองไม่ได้');if(u.friends.includes(n))return toast('เป็นเพื่อนกันแล้ว');
+ u.friends.push(n);trophy('มีเพื่อนแล้ว');sv();render();
+}
+function sendChat(){
+ const i=$('chat-in'),t=i.value.trim();if(!t||!chatWith)return;
+ const u=U(),w=chatWith;(u.chats[w]=u.chats[w]||[]).push({me:1,t});sv();render();
+ setTimeout(()=>{if(!db.users[me])return;db.users[me].chats[w].push({me:0,t:REPLY[Math.floor(Math.random()*REPLY.length)]});sv();if(tab==='friends'&&chatWith===w)render()},900);
+}
+function vInv(){
+ const u=U(),items=[['🪙',u.coins+' เหรียญ'],['🔑',u.keys+' กุญแจ'],['🎫',(u.certs||0)+' บัตรรับรอง'],...u.avs.map(a=>[a,'อวตาร์']),...u.frs.filter(f=>f!=='none').map(f=>['🖼️','กรอบ: '+f]),...u.trophies.map(t=>['🏆',t])];
+ return `<h2 class="text-xl font-bold mb-3">🎒 คลังสมบัติส่วนตัว</h2><h3 class="font-bold text-purple-700 mb-2">🎴 บัตรของฉัน</h3>${u.fx&&(u.fx.shield||u.fx.x2||u.fx.gx2)?`<p class="text-xs mb-2">เอฟเฟกต์ที่เปิดอยู่: ${u.fx.shield?'🛡️ กันกับดัก ':''}${u.fx.x2?'✨ รางวัล×2 ':''}${u.fx.gx2?'💰 เหรียญเกม×2':''}</p>`:''}<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">${CARDS.map(c=>{const n=(u.cards||{})[c[0]]||0;return `<div class="card"><div class="flex items-center gap-3"><span class="text-3xl">${c[1]}</span><div class="flex-1"><div class="text-sm font-bold">${c[2]} ×${n}</div><div class="text-[11px] text-gray-600">${c[3]}</div></div></div><div class="flex gap-2 mt-2">${c[0]==='scan'?'<input id="scan-in" placeholder="รหัสที่ต้องการตรวจ" class="flex-1 px-2 py-1 text-xs rounded-lg border border-p3 uppercase">':'<span class="flex-1"></span>'}<button onclick="useCard('${c[0]}')" ${n?'':'disabled'} class="btn bg-purple-700 text-white disabled:bg-gray-300">ใช้</button></div></div>`}).join('')}</div>
+ ${(()=>{const f=(u.found||[]).filter(c=>db.codes[c]&&!u.used.some(x=>x.startsWith(c+' ')));return f.length?`<h3 class="font-bold mb-2">🧭 โค้ดที่ค้นพบ (ยังไม่ได้ใช้)</h3><div class="flex flex-wrap gap-2 mb-5">${f.map(c=>`<span class="font-mono font-bold bg-yellow-100 px-2 py-1 rounded-lg text-sm">${esc(c)}</span>`).join('')}</div>`:''})()}<h3 class="font-bold mb-2">🧳 ของสะสม</h3><div class="grid grid-cols-2 sm:grid-cols-3 gap-3">${items.map(([i,t])=>`<div class="card flex items-center gap-3"><span class="text-3xl">${i}</span><span class="text-sm font-semibold">${esc(t)}</span></div>`).join('')}</div>`;
+}
+let ct='news';
+const fld='w-full px-3 py-2 rounded-xl border-2 border-p3 text-sm focus:outline-none focus:border-vgold';
+function openCreator(){if(!isAdm())return;ct='news';creator.classList.remove('hidden');creator.classList.add('flex');drawCreator()}
+function closeCreator(){creator.classList.add('hidden');creator.classList.remove('flex')}
+function setCT(t){ct=t;drawCreator()}
+function drawCreator(){
+ const T=[['news','📰 โพสต์ข่าว'],['code','🎁 สร้างโค้ด'],['me','⚡ ปรับค่าตัวเอง'],['cats','📂 หมวดโค้ด'],['list','🗂️ จัดการ']];
+ $('ct-tabs').innerHTML=T.map(([k,l])=>`<button onclick="setCT('${k}')" class="btn whitespace-nowrap ${ct===k?'bg-purple-700 text-white':'bg-p2'}">${l}</button>`).join('');
+ const lab=(t,s)=>`<label class="block font-bold mt-3 mb-1">${t}${s?`<span class="block font-normal text-xs text-gray-500">${s}</span>`:''}</label>`;
+ const u=U();let h='';
+ if(ct==='news')h=`<p class="text-xs text-gray-600">เขียนประกาศให้ผู้เล่นเห็นในแท็บ "ข่าวสาร"</p>
+ ${lab('1. เลือกประเภทข่าว')}<select id="n-type" class="${fld}"><option value="hint">🔍 คำใบ้ (ใบ้โค้ดลับ)</option><option value="code">🎁 แจกโค้ด</option><option value="warning">⚠️ เตือนภัย (รหัสกับดัก)</option></select>
+ ${lab('2. หัวข้อ')}<input id="n-title" class="${fld}" placeholder="เช่น คำใบ้ประจำวัน">
+ ${lab('3. เนื้อหา')}<textarea id="n-body" rows="3" class="${fld}" placeholder="เขียนข้อความที่ต้องการ"></textarea>
+ <label class="flex items-center gap-2 text-xs mt-2"><input id="n-closed" type="checkbox"> 🔒 ปิดคอมเมนต์โพสต์นี้</label>
+ <button onclick="postNews()" class="btn w-full bg-purple-700 text-white py-2.5 mt-4">📢 โพสต์ข่าว</button>`;
+ else if(ct==='code')h=`<p class="text-xs text-gray-600">สร้างรหัสลับให้ผู้เล่นพิมพ์ในแท็บ "ถอดรหัส"</p>
+ ${lab('1. ชื่อโค้ด','ห้ามเว้นวรรค เช่น SUMMER2026')}<input id="k-code" class="${fld} uppercase font-mono" placeholder="SUMMER2026">
+ ${lab('2. โค้ดนี้เป็นแบบไหน')}<select id="k-kind" class="${fld}"><option value="reward">🎁 โค้ดรางวัล (ผู้เล่นได้ของ)</option><option value="trap">💀 รหัสกับดัก (ผู้เล่นเสียของ)</option></select>
+ ${lab('หมวดโค้ด (ไม่บังคับ)','ผู้เล่นใช้ได้เพียง 1 โค้ดต่อหมวด · สร้างหมวดได้ที่แท็บ 📂 หมวดโค้ด')}<select id="k-cat" class="${fld}"><option value="">— ไม่มีหมวด —</option>${(db.cats||[]).map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
+ ${lab('3. จำนวนที่ผู้เล่นจะ "ได้" (โค้ดรางวัล) หรือ "เสีย" (รหัสกับดัก)')}<div class="flex gap-2"><div class="flex-1"><span class="text-xs">🪙 เหรียญ</span><input id="k-coins" type="number" min="0" value="50" class="${fld}"></div><div class="flex-1"><span class="text-xs">🔑 กุญแจ</span><input id="k-keys" type="number" min="0" value="0" class="${fld}"></div><div class="flex-1"><span class="text-xs">🎫 บัตรรับรอง</span><input id="k-certs" type="number" min="0" value="0" class="${fld}"></div></div>
+ ${lab('อายุโค้ด (ไม่บังคับ)','เมื่อครบเวลา ผู้เล่นจะแลกโค้ดนี้ไม่ได้ (นับจากตอนกดสร้าง)')}<div class="flex gap-2"><select id="k-exp-u" class="${fld}"><option value="">♾️ ไม่หมดอายุ</option><option value="m">นาที</option><option value="h">ชั่วโมง</option><option value="d">วัน</option></select><input id="k-exp-n" type="number" min="1" value="1" class="${fld}" placeholder="จำนวน"></div>
+ <label class="flex items-center gap-2 text-xs mt-3"><input id="k-post" type="checkbox"> ประกาศเป็นข่าว "มีโค้ดใหม่" ด้วย (ไม่บอกตัวโค้ด)</label>
+ <label class="flex items-center gap-2 text-xs mt-2"><input id="k-mini" type="checkbox"> 🎮 ซ่อนโค้ดนี้ไว้ให้ผู้เล่นค้นหาในมินิเกม (ใช้กับโค้ดรางวัลเท่านั้น)</label>
+ <button onclick="makeCode()" class="btn w-full bg-purple-700 text-white py-2.5 mt-4">✅ สร้างโค้ด</button>`;
+ else if(ct==='me')h=`<p class="text-xs text-gray-600">ตอนนี้คุณมี 🪙 <b>${u.coins}</b> เหรียญ และ 🔑 <b>${u.keys}</b> กุญแจ</p>
+ <div class="flex gap-2 mt-3"><button onclick="addSelf(100,0)" class="btn flex-1 bg-yellow-100">+100 🪙</button><button onclick="addSelf(1000,0)" class="btn flex-1 bg-yellow-100">+1000 🪙</button><button onclick="addSelf(0,10)" class="btn flex-1 bg-amber-100">+10 🔑</button><button onclick="U().certs=(U().certs||0)+5;sv();render();drawCreator()" class="btn flex-1 bg-purple-100">+5 🎫</button></div>
+ ${lab('หรือตั้งค่าเป็นจำนวนที่ต้องการ')}<div class="flex gap-2"><input id="g-coins" type="number" min="0" value="${u.coins}" class="${fld}"><input id="g-keys" type="number" min="0" value="${u.keys}" class="${fld}"></div>
+ <button onclick="saveSelf()" class="btn w-full bg-purple-700 text-white py-2.5 mt-4">💾 บันทึก</button>`;
+ else if(ct==='cats')h=catsPanel();
+ else h=`<b>🎁 โค้ดทั้งหมด (${Object.keys(db.codes).length})</b><div class="mt-1 space-y-1">${Object.entries(db.codes).map(([c,d])=>`<div class="flex items-center justify-between bg-p1 rounded-lg px-2 py-1"><span class="font-mono text-xs"><b>${esc(c)}</b>${d.mini?' 🎮':''}${expT(d)} ${d.trap?`💀 กับดัก -${d.coins!==undefined?d.coins:50}🪙 -${d.keys!==undefined?d.keys:1}🔑`:`🪙${d.coins||0} 🔑${d.keys||0}${d.certs?` 🎫${d.certs}`:''}`}</span><span class="flex flex-wrap justify-end items-center gap-2"><select onchange="setCodeExp('${esc(c)}',this.value)" class="text-xs px-1 py-0.5 rounded border border-p3"><option value="">⏳ ตั้งอายุ</option><option value="none">ไม่หมดอายุ</option><option value="h1">หมดใน 1 ชม.</option><option value="h6">หมดใน 6 ชม.</option><option value="d1">หมดใน 1 วัน</option><option value="d7">หมดใน 7 วัน</option></select><select onchange="setCodeCat('${esc(c)}',this.value)" class="text-xs px-1 py-0.5 rounded border border-p3"><option value="">หมวด: ไม่มี</option>${(db.cats||[]).map(k=>`<option value="${esc(k)}" ${d.cat===k?'selected':''}>${esc(k)}</option>`).join('')}</select><button onclick="delCode('${esc(c)}')" class="text-vred text-xs">🗑️ ลบ</button></span></div>`).join('')||'<i class="text-xs text-gray-500">ไม่มีโค้ด</i>'}</div>
+ <b class="block mt-4">📰 ข่าวทั้งหมด (${db.news.length})</b><div class="mt-1 space-y-1">${db.news.map(n=>`<div class="flex items-center justify-between bg-p1 rounded-lg px-2 py-1"><span class="text-xs">${TY[n.type][0]} ${esc(n.title)}</span><button onclick="delNews(${n.id})" class="text-vred text-xs">🗑️ ลบ</button></div>`).join('')||'<i class="text-xs text-gray-500">ไม่มีข่าว</i>'}</div>`;
+ $('ct-body').innerHTML=h;
+}
+function postNews(){
+ if(!isAdm())return;const ti=$('n-title').value.trim(),bo=$('n-body').value.trim();
+ if(!ti||!bo)return toast('กรอกหัวข้อและเนื้อหาให้ครบ');
+ db.news.push({id:Date.now(),type:$('n-type').value,title:ti,body:bo,comments:[],closed:$('n-closed').checked});
+ sv();toast('📢 โพสต์ข่าวแล้ว');render();drawCreator();
+}
+function makeCode(){
+ if(!isAdm())return;const c=$('k-code').value.trim().toUpperCase().replace(/[\s'"\\<>&`$]/g,'');
+ if(!c)return toast('ใส่ชื่อโค้ดก่อน');
+ const trap=$('k-kind').value==='trap';
+ db.codes[c]={coins:+$('k-coins').value||0,keys:+$('k-keys').value||0,certs:trap?0:(+$('k-certs').value||0)};if(trap)db.codes[c].trap=1;if($('k-mini')&&$('k-mini').checked&&!trap)db.codes[c].mini=1;const cg=$('k-cat')&&$('k-cat').value;if(cg)db.codes[c].cat=cg;
+ const eu=$('k-exp-u')&&$('k-exp-u').value,en=+$('k-exp-n').value;if(eu&&en>0)db.codes[c].exp=Date.now()+en*({m:60000,h:3600000,d:86400000}[eu]);
+ if($('k-post').checked)db.news.push({id:Date.now(),type:trap?'warning':'code',title:trap?'เตือนภัยรหัสใหม่':'มีโค้ดใหม่!',body:trap?'มีรหัสกับดักชุดใหม่ ระวังให้ดี!':'มีโค้ดลับชุดใหม่ซ่อนอยู่ ลองหาดู!',comments:[]});
+ sv();toast('✅ สร้างโค้ด '+c+' แล้ว');render();setCT('list');
+}
+function saveSelf(){
+ if(!isAdm())return;U().coins=Math.max(0,+$('g-coins').value||0);U().keys=Math.max(0,+$('g-keys').value||0);
+ sv();toast('💾 บันทึกแล้ว');render();drawCreator();
+}
+function addSelf(c,k){if(!isAdm())return;U().coins+=c;U().keys+=k;sv();render();drawCreator()}
+function delCode(c){if(!isAdm())return;delete db.codes[c];sv();toast('ลบโค้ด '+c+' แล้ว');drawCreator()}
+function delNews(id){if(!isAdm())return;db.news=db.news.filter(n=>n.id!==id);sv();render();if(!creator.classList.contains('hidden'))drawCreator()}
+if(db.cur&&db.cur!=='LA'&&db.users[db.cur]){me=db.cur;$('auth').classList.add('hidden');render()}
+initRoom().then(autoRoom);
+</script>
+</body>
+</html>

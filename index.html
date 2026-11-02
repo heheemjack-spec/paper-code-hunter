@@ -768,7 +768,7 @@ async function postNews(){
  toast('📢 โพสต์ข่าวแล้ว');render();drawCreator();
 }
 async function makeCode(){
- if(!isAdm())return;const c=$('k-code').value.trim().toUpperCase().replace(/[\\s'"\\<>&`$]/g,'');
+ if(!isAdm())return;const c=$('k-code').value.trim().toUpperCase().replace(/[\s'"\\<>&`$]/g,'');
  if(!/^[A-Z0-9_-]{3,32}$/.test(c))return toast('ใช้ A-Z, 0-9, _ หรือ - ความยาว 3-32 ตัว');
  const trap=$('k-kind').value==='trap',coins=+$('k-coins').value||0,keys=+$('k-keys').value||0,certs=trap?0:(+$('k-certs').value||0),cat=$('k-cat')&&$('k-cat').value||null;
  const eu=$('k-exp-u')&&$('k-exp-u').value,en=+$('k-exp-n').value;let expires=null;if(eu&&en>0)expires=new Date(Date.now()+en*({m:60000,h:3600000,d:86400000}[eu])).toISOString();

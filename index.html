@@ -215,8 +215,14 @@ async function login(){
  if(!entered||!p){$('a-err').textContent='กรอกชื่อผู้เล่นและรหัสผ่านให้ครบ';return}
  const email=/^LA$/i.test(entered)?'la@paper-code-hunter.invalid':(entered.includes('@')?entered:`${entered.toLowerCase()}@players.papercodehunter.com`);
  $('a-err').textContent='กำลังเข้าสู่ระบบ...';
- try{const {data,error}=await sb.auth.signInWithPassword({email,password:p});if(error)throw new Error('ชื่อผู้เล่นหรือรหัสผ่านไม่ถูกต้อง');await enterCloudUser(data.user)}
- catch(e){$('a-err').textContent=e.message||'เข้าสู่ระบบไม่สำเร็จ'}
+ try{
+  const {data,error}=await sb.auth.signInWithPassword({email,password:p});
+  if(error)throw error;
+  await enterCloudUser(data.user);
+ }catch(e){
+  console.error('Paper Code Hunter login error:',e);
+  $('a-err').textContent='เข้าสู่ระบบไม่สำเร็จ: '+(e.message||'ตรวจสอบชื่อผู้เล่นและรหัสผ่าน');
+ }
 }
 async function signup(){
  const username=$('a-email').value.trim(),name=$('a-name').value.trim()||username,p=$('a-pw').value;
@@ -225,11 +231,23 @@ async function signup(){
  if(p.length<8){$('a-err').textContent='รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';return}
  $('a-err').textContent='กำลังสมัครสมาชิก...';
  try{
-  const {error}=await sb.functions.invoke('register-player',{body:{username:username.toLowerCase(),display_name:name,password:p}});
-  if(error)throw error;
+  const {data,error}=await sb.functions.invoke('register-player',{body:{username:username.toLowerCase(),display_name:name,password:p}});
+  if(error){
+   let detail=error.message||'เรียกฟังก์ชันสมัครสมาชิกไม่สำเร็จ';
+   try{const body=await error.context.json();if(body?.error)detail=body.error;}catch{}
+   throw new Error('สมัครสมาชิกไม่สำเร็จ: '+detail);
+  }
+  if(!data?.success)throw new Error(data?.error||'ระบบไม่ได้ยืนยันการสร้างบัญชี');
   $('a-email').value=username.toLowerCase();
-  await login();
- }catch(e){$('a-err').textContent=e.message||'สมัครสมาชิกไม่สำเร็จ'}
+  $('a-err').textContent='สร้างบัญชีสำเร็จ กำลังเข้าสู่ระบบ...';
+  const email=`${username.toLowerCase()}@players.papercodehunter.com`;
+  const {data:authData,error:authError}=await sb.auth.signInWithPassword({email,password:p});
+  if(authError)throw new Error('สร้างบัญชีสำเร็จแล้ว แต่เข้าสู่ระบบไม่สำเร็จ: '+authError.message+' กรุณาลองเข้าสู่ระบบอีกครั้ง');
+  await enterCloudUser(authData.user);
+ }catch(e){
+  console.error('Paper Code Hunter signup error:',e);
+  $('a-err').textContent=e.message||'สมัครสมาชิกไม่สำเร็จ กรุณาลองใหม่';
+ }
 }
 function enterGuest(){
  if(cloudUid)return toast('กรุณาออกจากบัญชีออนไลน์ก่อน');

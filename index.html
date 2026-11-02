@@ -835,6 +835,8 @@ function drawCreator(){
  ${lab('2. โค้ดนี้เป็นแบบไหน')}<select id="k-kind" class="${fld}"><option value="reward">🎁 โค้ดรางวัล (ผู้เล่นได้ของ)</option><option value="trap">💀 รหัสกับดัก (ผู้เล่นเสียของ)</option></select>
  ${lab('หมวดโค้ด (ไม่บังคับ)','ผู้เล่นใช้ได้เพียง 1 โค้ดต่อหมวด · สร้างหมวดได้ที่แท็บ 📂 หมวดโค้ด')}<select id="k-cat" class="${fld}"><option value="">— ไม่มีหมวด —</option>${(db.cats||[]).map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
  ${lab('3. จำนวนที่ผู้เล่นจะ "ได้" (โค้ดรางวัล) หรือ "เสีย" (รหัสกับดัก)')}<div class="flex gap-2"><div class="flex-1"><span class="text-xs">🪙 เหรียญ</span><input id="k-coins" type="number" min="0" value="50" class="${fld}"></div><div class="flex-1"><span class="text-xs">🔑 กุญแจ</span><input id="k-keys" type="number" min="0" value="0" class="${fld}"></div><div class="flex-1"><span class="text-xs">🎫 บัตรรับรอง</span><input id="k-certs" type="number" min="0" value="0" class="${fld}"></div></div>
+ ${lab('จำนวนสิทธิ์กู้โค้ด','กำหนดได้ 1–5,555 ครั้ง (นับรวมผู้เล่นทุกคน)')}<input id="k-max" type="number" min="1" max="5555" value="5555" class="${fld}">
+ ${lab('รางวัลพิเศษเพิ่มเติม','นอกจากเหรียญ กุญแจ และบัตรรับรอง')}<div class="grid grid-cols-2 gap-2"><select id="k-reward-type" class="${fld}" onchange="updateRewardChoices()"><option value="none">ไม่มี</option><option value="avatar">อวตาร์</option><option value="frame">กรอบโปรไฟล์</option><option value="title">ฉายา</option><option value="card">บัตรไอเทม</option></select><select id="k-reward-value" class="${fld}"><option value="">เลือกรางวัล</option></select></div><input id="k-reward-qty" type="number" min="1" max="5555" value="1" class="${fld} mt-2" placeholder="จำนวนไอเทม">
  ${lab('อายุโค้ด (ไม่บังคับ)','เมื่อครบเวลา ผู้เล่นจะแลกโค้ดนี้ไม่ได้ (นับจากตอนกดสร้าง)')}<div class="flex gap-2"><select id="k-exp-u" class="${fld}"><option value="">♾️ ไม่หมดอายุ</option><option value="m">นาที</option><option value="h">ชั่วโมง</option><option value="d">วัน</option></select><input id="k-exp-n" type="number" min="1" value="1" class="${fld}" placeholder="จำนวน"></div>
  <label class="flex items-center gap-2 text-xs mt-3"><input id="k-post" type="checkbox"> ประกาศเป็นข่าว "มีโค้ดใหม่" ด้วย (ไม่บอกตัวโค้ด)</label>
  <label class="flex items-center gap-2 text-xs mt-2"><input id="k-mini" type="checkbox"> 🎮 ซ่อนโค้ดนี้ไว้ให้ผู้เล่นค้นหาในมินิเกม (ใช้กับโค้ดรางวัลเท่านั้น)</label>
@@ -847,6 +849,35 @@ function drawCreator(){
  else h=`<b>🎁 โค้ดทั้งหมด (${Object.keys(db.codes).length})</b><div class="mt-1 space-y-1">${Object.entries(db.codes).map(([c,d])=>`<div class="flex items-center justify-between bg-p1 rounded-lg px-2 py-1"><span class="font-mono text-xs"><b>${esc(c)}</b>${d.mini?' 🎮':''}${expT(d)} ${d.trap?`💀 กับดัก -${d.coins!==undefined?d.coins:50}🪙 -${d.keys!==undefined?d.keys:1}🔑`:`🪙${d.coins||0} 🔑${d.keys||0}${d.certs?` 🎫${d.certs}`:''}`}</span><span class="flex flex-wrap justify-end items-center gap-2"><select onchange="setCodeExp('${esc(c)}',this.value)" class="text-xs px-1 py-0.5 rounded border border-p3"><option value="">⏳ ตั้งอายุ</option><option value="none">ไม่หมดอายุ</option><option value="h1">หมดใน 1 ชม.</option><option value="h6">หมดใน 6 ชม.</option><option value="d1">หมดใน 1 วัน</option><option value="d7">หมดใน 7 วัน</option></select><select onchange="setCodeCat('${esc(c)}',this.value)" class="text-xs px-1 py-0.5 rounded border border-p3"><option value="">หมวด: ไม่มี</option>${(db.cats||[]).map(k=>`<option value="${esc(k)}" ${d.cat===k?'selected':''}>${esc(k)}</option>`).join('')}</select><button onclick="delCode('${esc(c)}')" class="text-vred text-xs">🗑️ ลบ</button></span></div>`).join('')||'<i class="text-xs text-gray-500">ไม่มีโค้ด</i>'}</div>
  <b class="block mt-4">📰 ข่าวทั้งหมด (${db.news.length})</b><div class="mt-1 space-y-1">${db.news.map(n=>`<div class="flex items-center justify-between bg-p1 rounded-lg px-2 py-1"><span class="text-xs">${TY[n.type][0]} ${esc(n.title)}</span><button onclick="delNews(${n.id})" class="text-vred text-xs">🗑️ ลบ</button></div>`).join('')||'<i class="text-xs text-gray-500">ไม่มีข่าว</i>'}</div>`;
  $('ct-body').innerHTML=h;
+ if(ct==='code')updateRewardChoices();
+ if(ct==='list'&&cloudUid)loadCreatorCodes();
+}
+const rewardCatalog={
+ avatar:AV.map(x=>[x[0],x[1]+' '+x[1]]),
+ frame:FR.filter(x=>x[0]!=='none').map(x=>[x[0],x[1]]),
+ title:TT.map(x=>[x[0],x[0]]),
+ card:CARDS.map(x=>[x[0],x[1]+' '+x[2]])
+};
+function updateRewardChoices(){
+ const t=$('k-reward-type'),v=$('k-reward-value');if(!t||!v)return;
+ const list=rewardCatalog[t.value]||[];
+ v.innerHTML='<option value="">เลือกรางวัล</option>'+list.map(x=>'<option value="'+esc(x[0])+'">'+esc(x[1])+'</option>').join('');
+ v.disabled=!list.length;
+}
+async function loadCreatorCodes(){
+ const body=$('ct-body');if(!body||ct!=='list'||!cloudUid)return;
+ body.innerHTML='<p class="text-xs text-gray-500">กำลังโหลดโค้ดจากเซิร์ฟเวอร์...</p>';
+ const {data,error}=await sb.rpc('admin_list_redeem_codes');
+ if(error)return body.innerHTML='<p class="text-vred text-xs">โหลดรายการไม่สำเร็จ: '+esc(error.message)+'</p>';
+ if(!Array.isArray(data))return body.innerHTML='<p class="text-vred text-xs">'+esc(data&&data.message||'ไม่มีสิทธิ์ดูรายการ')+'</p>';
+ body.innerHTML='<b>🎁 โค้ดทั้งหมด ('+data.length+')</b><p class="text-xs text-gray-500 mb-2">สิทธิ์กู้สูงสุดต่อโค้ดไม่เกิน 5,555 ครั้ง</p><div class="space-y-2">'+data.map(d=>'<div class="card"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><b class="font-mono">'+esc(d.code)+'</b><div class="text-xs mt-1">🪙'+d.coins+' 🔑'+d.keys+' 🎫'+d.certs+(d.reward_type&&d.reward_type!=='none'?' · '+esc(d.reward_type)+':'+esc(d.reward_value)+' ×'+d.reward_qty:'')+'</div><div class="text-xs text-gray-500">ใช้แล้ว '+d.redeemed_count+'/'+d.max_redemptions+' · '+(d.active?'เปิดใช้งาน':'ปิดใช้งาน')+(d.expires_at?' · หมดอายุ '+new Date(d.expires_at).toLocaleString('th-TH'):'')+'</div></div><div class="flex flex-col gap-1 shrink-0"><button class="btn '+(d.active?'bg-amber-100':'bg-green-100')+'" onclick="setCodeActive(\''+esc(d.code)+'\','+(!d.active)+')">'+(d.active?'ปิดโค้ด':'เปิดโค้ด')+'</button><button class="btn bg-red-100 text-red-700" onclick="delCode(\''+esc(d.code)+'\')">ลบ</button></div></div></div>').join('')+'</div>';
+}
+async function setCodeActive(c,on){
+ if(!isAdm())return;
+ const {data,error}=await sb.rpc('admin_set_redeem_code_active',{p_code:c,p_active:on});
+ if(error)return toast(error.message);
+ if(!data||data.success!==true)return toast(data&&data.message||'เปลี่ยนสถานะไม่สำเร็จ');
+ toast(on?'เปิดโค้ดแล้ว':'ปิดโค้ดแล้ว');loadCreatorCodes();
 }
 async function postNews(){
  if(!isAdm())return;const ti=$('n-title').value.trim(),bo=$('n-body').value.trim();
@@ -864,8 +895,8 @@ async function makeCode(){
  const trap=$('k-kind').value==='trap',coins=+$('k-coins').value||0,keys=+$('k-keys').value||0,certs=trap?0:(+$('k-certs').value||0),cat=$('k-cat')&&$('k-cat').value||null;
  const eu=$('k-exp-u')&&$('k-exp-u').value,en=+$('k-exp-n').value;let expires=null;if(eu&&en>0)expires=new Date(Date.now()+en*({m:60000,h:3600000,d:86400000}[eu])).toISOString();
  const mini=!!($('k-mini')&&$('k-mini').checked&&!trap);
- if(cloudUid){const {data,error}=await sb.rpc('admin_create_redeem_code',{p_code:c,p_coins:coins,p_keys:keys,p_certs:certs,p_is_trap:trap,p_category:cat,p_expires_at:expires,p_mini:mini});if(error)return toast(error.message||'สร้างโค้ดไม่สำเร็จ');if(!data||data.success!==true)return toast((data&&data.message)||'สร้างโค้ดไม่สำเร็จ')}
- else{db.codes[c]={coins,keys,certs};if(trap)db.codes[c].trap=1;if(mini)db.codes[c].mini=1;if(cat)db.codes[c].cat=cat;if(expires)db.codes[c].exp=Date.parse(expires)}
+ if(cloudUid){const {data,error}=await sb.rpc('admin_create_redeem_code',{p_code:c,p_coins:coins,p_keys:keys,p_certs:certs,p_is_trap:trap,p_category:cat,p_expires_at:expires,p_mini:mini,p_max_redemptions:Math.max(1,Math.min(5555,parseInt($('k-max').value,10)||5555)),p_reward_type:$('k-reward-type').value,p_reward_value:$('k-reward-value').value||null,p_reward_qty:Math.max(1,Math.min(5555,parseInt($('k-reward-qty').value,10)||1))});if(error)return toast(error.message||'สร้างโค้ดไม่สำเร็จ');if(!data||data.success!==true)return toast((data&&data.message)||'สร้างโค้ดไม่สำเร็จ')}
+ else{db.codes[c]={coins,keys,certs,max:Math.max(1,Math.min(5555,parseInt($('k-max').value,10)||5555)),rewardType:$('k-reward-type').value,rewardValue:$('k-reward-value').value,rewardQty:Math.max(1,Math.min(5555,parseInt($('k-reward-qty').value,10)||1)),redeemed:0};if(trap)db.codes[c].trap=1;if(mini)db.codes[c].mini=1;if(cat)db.codes[c].cat=cat;if(expires)db.codes[c].exp=Date.parse(expires)}
  if($('k-post').checked){if(cloudUid){const {error}=await sb.from('news').insert({title:trap?'เตือนภัยรหัสใหม่':'มีโค้ดใหม่!',content:trap?'มีรหัสกับดักชุดใหม่ ระวังให้ดี!':'มีโค้ดลับชุดใหม่ซ่อนอยู่ ลองหาดู!',published:true});if(error)toast('สร้างโค้ดสำเร็จ แต่ประกาศข่าวไม่สำเร็จ')}else db.news.push({id:Date.now(),type:trap?'warning':'code',title:trap?'เตือนภัยรหัสใหม่':'มีโค้ดใหม่!',body:trap?'มีรหัสกับดักชุดใหม่ ระวังให้ดี!':'มีโค้ดลับชุดใหม่ซ่อนอยู่ ลองหาดู!',comments:[]})}
  if(!cloudUid)sv();toast('สร้างโค้ด '+c+' สำเร็จ');render();setCT('list');
 }
@@ -874,7 +905,7 @@ function saveSelf(){
  sv();toast('💾 บันทึกแล้ว');render();drawCreator();
 }
 function addSelf(c,k){if(!isAdm())return;U().coins+=c;U().keys+=k;sv();render();drawCreator()}
-function delCode(c){if(!isAdm())return;if(cloudUid)return toast('ระบบจัดการโค้ดออนไลน์ยังต้องตั้งค่า RPC ที่ปลอดภัยก่อน');delete db.codes[c];sv();toast('ลบโค้ด '+c+' แล้ว');drawCreator()}
+async function delCode(c){if(!isAdm())return;if(cloudUid){if(!confirm('ยืนยันลบโค้ด '+c+' ?'))return;const {data,error}=await sb.rpc('admin_delete_redeem_code',{p_code:c});if(error)return toast(error.message);if(!data||data.success!==true)return toast(data&&data.message||'ลบไม่สำเร็จ');toast('ลบโค้ด '+c+' แล้ว');return loadCreatorCodes()}delete db.codes[c];sv();toast('ลบโค้ด '+c+' แล้ว');drawCreator()}
 async function delNews(id){
  if(!isAdm())return;
  if(cloudUid){const {error}=await sb.from('news').delete().eq('id',id);if(error)return toast('ลบข่าวไม่สำเร็จ: '+error.message)}

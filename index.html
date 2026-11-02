@@ -861,7 +861,7 @@ function drawCreator(){
  if(ct==='list'&&cloudUid)loadCreatorCodes();
 }
 const rewardCatalog={
- avatar:AV.map(x=>[x[0],x[1]+' '+x[1]]),
+ avatar:AV.map(x=>[x[0],x[0]+' '+x[1]]),
  frame:FR.filter(x=>x[0]!=='none').map(x=>[x[0],x[1]]),
  title:TT.map(x=>[x[0],x[0]]),
  card:CARDS.map(x=>[x[0],x[1]+' '+x[2]])

@@ -283,21 +283,27 @@ function vRedeem(){
  <div class="card flex gap-2 mb-4"><input id="code-in" onkeydown="if(event.key==='Enter')submitCode()" placeholder="เช่น PAPER2026" class="flex-1 px-3 py-2 rounded-xl border-2 border-p3 font-mono font-bold uppercase focus:outline-none focus:border-vgold"><button onclick="submitCode()" class="btn bg-vgold text-p9">🔓 ถอดรหัส</button></div>
  <div class="card text-left"><div class="font-bold text-sm mb-1">📜 ประวัติ (${h.length})</div><div class="text-xs font-mono space-y-1 max-h-40 overflow-y-auto">${h.length?h.slice().reverse().map(x=>`<div>${esc(x)}</div>`).join(''):'<i class="text-gray-500">ยังไม่มีประวัติ</i>'}</div></div></div>`;
 }
-function submitCode(){
- if(cloudUid)return toast('ระบบแลกรางวัลออนไลน์กำลังตั้งค่าความปลอดภัย กรุณาลองใหม่ภายหลัง');
+async function submitCode(){
  const c=$('code-in').value.trim().toUpperCase();if(!c)return;
- const u=U(),d=db.codes[c];
- if(!d){toast('❌ ไม่พบรหัสนี้');return}
- if(d.exp&&Date.now()>d.exp){toast('⌛ โค้ดนี้หมดอายุแล้ว');return}
+ if(cloudUid){
+  const {data,error}=await sb.rpc('redeem_player_code',{p_code:c});
+  if(error)return toast(error.message||'แลกรหัสไม่สำเร็จ');
+  if(!data||data.success!==true)return toast((data&&data.message)||'แลกรหัสไม่สำเร็จ');
+  const u=U();u.coins=data.coins;u.keys=data.keys;u.certs=data.certs;u.used=Array.isArray(u.used)?u.used:[];u.used.push(data.history);
+  if(data.category){u.cu=u.cu||{};u.cu[data.category]=c}
+  if(data.shielded){if(u.fx)delete u.fx.shield;toast('🛡️ บัตรกันกับดักช่วยไว้ได้!')}
+  else if(data.trap){$('alarm-msg').textContent=data.message||'คุณถูกหลอก!';$('alarm').classList.remove('hidden');$('alarm').classList.add('flex')}
+  else{trophy('นักถอดรหัส');if(u.used.length>=3)trophy('นักล่าโค้ดตัวจริง');toast(data.message||'แลกรหัสสำเร็จ')}
+  render();return;
+ }
+ const u=U(),d=db.codes[c];if(!d)return toast('❌ ไม่พบรหัสนี้');
+ if(d.exp&&Date.now()>d.exp)return toast('⌛ โค้ดนี้หมดอายุแล้ว');
  if(u.used.some(x=>x.startsWith(c+' ')))return toast('ใช้รหัสนี้ไปแล้ว');
- if(d.cat){u.cu=u.cu||{};if(u.cu[d.cat])return toast(`📂 หมวด "${d.cat}" ใช้ได้เพียง 1 โค้ด (คุณใช้ ${u.cu[d.cat]} ไปแล้ว)`);u.cu[d.cat]=c}
+ if(d.cat){u.cu=u.cu||{};if(u.cu[d.cat])return toast('หมวดนี้ใช้ได้เพียง 1 โค้ด');u.cu[d.cat]=c}
  if(d.trap&&u.fx&&u.fx.shield){delete u.fx.shield;u.used.push(c+' → 🛡️ กันกับดักสำเร็จ');sv();toast('🛡️ บัตรกันกับดักช่วยไว้ได้!');render();return}
- if(d.trap){const l=d.coins!==undefined?d.coins:50,kl=d.keys!==undefined?d.keys:1;u.coins-=l;u.keys-=kl;u.used.push(c+' → 💀 กับดัก -'+l+'🪙 -'+kl+'🔑');sv();
-  $('alarm-msg').textContent=`คุณถูกหลอก! เสีย ${l} เหรียญ และกุญแจ ${kl} ดอก${u.coins<0?` (ตอนนี้ติดหนี้ ${-u.coins} เหรียญ ไปหาโค้ดหรือเล่นมินิเกมเพื่อใช้คืน)`:''}`;$('alarm').classList.remove('hidden');$('alarm').classList.add('flex');render();return}
+ if(d.trap){const l=d.coins!==undefined?d.coins:50,kl=d.keys!==undefined?d.keys:1;u.coins-=l;u.keys-=kl;u.used.push(c+' → 💀 กับดัก -'+l+'🪙 -'+kl+'🔑');sv();$('alarm-msg').textContent='คุณถูกหลอก! เสีย '+l+' เหรียญ และกุญแจ '+kl+' ดอก';$('alarm').classList.remove('hidden');$('alarm').classList.add('flex');render();return}
  const mx=u.fx&&u.fx.x2?2:1;if(mx>1)delete u.fx.x2;const rc=(d.coins||0)*mx,rk=(d.keys||0)*mx,rt=d.certs||0;u.coins+=rc;u.keys+=rk;u.certs=(u.certs||0)+rt;
- u.used.push(`${c} → +${rc}🪙 +${rk}🔑${rt?` +${rt}🎫`:''}${mx>1?' (×2)':''}`);
- trophy('นักถอดรหัส');if(u.used.length>=3)trophy('นักล่าโค้ดตัวจริง');
- sv();toast(`✅ สำเร็จ! +${rc}🪙 +${rk}🔑${rt?` +${rt}🎫`:''}${mx>1?' (บัตร ×2)':''}`);render();
+ u.used.push(c+' → +'+rc+'🪙 +'+rk+'🔑'+(rt?' +'+rt+'🎫':'')+(mx>1?' (×2)':''));trophy('นักถอดรหัส');if(u.used.length>=3)trophy('นักล่าโค้ดตัวจริง');sv();toast('✅ สำเร็จ! +'+rc+'🪙 +'+rk+'🔑'+(rt?' +'+rt+'🎫':''));render();
 }
 const REQ={'av:🌟':2,'av:🚀':1,'fr:crown':2,'fr:rainbow':1,'tt:มหาเศรษฐีสมุดบันทึก':1,'tt:ผู้พิชิตความมืด':1,'tt:เทพเจ้าแห่งโค้ดลับ':2,'tt:ราชันย์นักสืบ':1,'card:post':1,'card:map':1,'key:4':1};
 const rq=k=>REQ[k]||0,rqT=k=>rq(k)?` +🎫${rq(k)}`:'';
@@ -761,14 +767,16 @@ async function postNews(){
  }else db.news.push({id:Date.now(),type:$('n-type').value,title:ti,body:bo,comments:[],closed:$('n-closed').checked});
  toast('📢 โพสต์ข่าวแล้ว');render();drawCreator();
 }
-function makeCode(){
- if(!isAdm())return;if(cloudUid)return toast('ระบบจัดการโค้ดออนไลน์ยังต้องตั้งค่า RPC ที่ปลอดภัยก่อน');const c=$('k-code').value.trim().toUpperCase().replace(/[\s'"\\<>&`$]/g,'');
- if(!c)return toast('ใส่ชื่อโค้ดก่อน');
- const trap=$('k-kind').value==='trap';
- db.codes[c]={coins:+$('k-coins').value||0,keys:+$('k-keys').value||0,certs:trap?0:(+$('k-certs').value||0)};if(trap)db.codes[c].trap=1;if($('k-mini')&&$('k-mini').checked&&!trap)db.codes[c].mini=1;const cg=$('k-cat')&&$('k-cat').value;if(cg)db.codes[c].cat=cg;
- const eu=$('k-exp-u')&&$('k-exp-u').value,en=+$('k-exp-n').value;if(eu&&en>0)db.codes[c].exp=Date.now()+en*({m:60000,h:3600000,d:86400000}[eu]);
- if($('k-post').checked)db.news.push({id:Date.now(),type:trap?'warning':'code',title:trap?'เตือนภัยรหัสใหม่':'มีโค้ดใหม่!',body:trap?'มีรหัสกับดักชุดใหม่ ระวังให้ดี!':'มีโค้ดลับชุดใหม่ซ่อนอยู่ ลองหาดู!',comments:[]});
- sv();toast('✅ สร้างโค้ด '+c+' แล้ว');render();setCT('list');
+async function makeCode(){
+ if(!isAdm())return;const c=$('k-code').value.trim().toUpperCase().replace(/[\\s'"\\<>&`$]/g,'');
+ if(!/^[A-Z0-9_-]{3,32}$/.test(c))return toast('ใช้ A-Z, 0-9, _ หรือ - ความยาว 3-32 ตัว');
+ const trap=$('k-kind').value==='trap',coins=+$('k-coins').value||0,keys=+$('k-keys').value||0,certs=trap?0:(+$('k-certs').value||0),cat=$('k-cat')&&$('k-cat').value||null;
+ const eu=$('k-exp-u')&&$('k-exp-u').value,en=+$('k-exp-n').value;let expires=null;if(eu&&en>0)expires=new Date(Date.now()+en*({m:60000,h:3600000,d:86400000}[eu])).toISOString();
+ const mini=!!($('k-mini')&&$('k-mini').checked&&!trap);
+ if(cloudUid){const {data,error}=await sb.rpc('admin_create_redeem_code',{p_code:c,p_coins:coins,p_keys:keys,p_certs:certs,p_is_trap:trap,p_category:cat,p_expires_at:expires,p_mini:mini});if(error)return toast(error.message||'สร้างโค้ดไม่สำเร็จ');if(!data||data.success!==true)return toast((data&&data.message)||'สร้างโค้ดไม่สำเร็จ')}
+ else{db.codes[c]={coins,keys,certs};if(trap)db.codes[c].trap=1;if(mini)db.codes[c].mini=1;if(cat)db.codes[c].cat=cat;if(expires)db.codes[c].exp=Date.parse(expires)}
+ if($('k-post').checked){if(cloudUid){const {error}=await sb.from('news').insert({title:trap?'เตือนภัยรหัสใหม่':'มีโค้ดใหม่!',content:trap?'มีรหัสกับดักชุดใหม่ ระวังให้ดี!':'มีโค้ดลับชุดใหม่ซ่อนอยู่ ลองหาดู!',published:true});if(error)toast('สร้างโค้ดสำเร็จ แต่ประกาศข่าวไม่สำเร็จ')}else db.news.push({id:Date.now(),type:trap?'warning':'code',title:trap?'เตือนภัยรหัสใหม่':'มีโค้ดใหม่!',body:trap?'มีรหัสกับดักชุดใหม่ ระวังให้ดี!':'มีโค้ดลับชุดใหม่ซ่อนอยู่ ลองหาดู!',comments:[]})}
+ if(!cloudUid)sv();toast('สร้างโค้ด '+c+' สำเร็จ');render();setCT('list');
 }
 function saveSelf(){
  if(!isAdm())return;U().coins=Math.max(0,+$('g-coins').value||0);U().keys=Math.max(0,+$('g-keys').value||0);

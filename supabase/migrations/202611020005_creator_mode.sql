@@ -205,3 +205,5 @@ grant execute on function public.admin_list_redeem_codes() to authenticated;
 grant execute on function public.admin_delete_redeem_code(text) to authenticated;
 grant execute on function public.admin_set_redeem_code_active(text,boolean) to authenticated;
 grant execute on function public.redeem_player_code(text) to authenticated;
+
+notify pgrst, 'reload schema';

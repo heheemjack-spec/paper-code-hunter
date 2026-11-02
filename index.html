@@ -175,7 +175,7 @@ async function enterCloudUser(user){
 async function login(){
  const entered=$('a-email').value.trim(),p=$('a-pw').value;
  if(!entered||!p){$('a-err').textContent='กรอกชื่อผู้เล่นและรหัสผ่านให้ครบ';return}
- const email=/^LA$/i.test(entered)?'la@paper-code-hunter.invalid':(entered.includes('@')?entered:`${entered.toLowerCase()}@players.paper-code-hunter.invalid`);
+ const email=/^LA$/i.test(entered)?'la@paper-code-hunter.invalid':(entered.includes('@')?entered:`${entered.toLowerCase()}@players.papercodehunter.com`);
  $('a-err').textContent='กำลังเข้าสู่ระบบ...';
  try{const {data,error}=await sb.auth.signInWithPassword({email,password:p});if(error)throw new Error('ชื่อผู้เล่นหรือรหัสผ่านไม่ถูกต้อง');await enterCloudUser(data.user)}
  catch(e){$('a-err').textContent=e.message||'เข้าสู่ระบบไม่สำเร็จ'}

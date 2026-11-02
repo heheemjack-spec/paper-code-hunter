@@ -167,7 +167,7 @@ async function enterCloudUser(user){
  if(!u.coins&&u.coins!==0)u.coins=100;if(!u.keys&&u.keys!==0)u.keys=3;
  db.cur=null;cloudReady=true;
  const ar=await sb.rpc('is_admin');admin=!ar.error&&ar.data===true;
- const nr=await sb.from('news').select('id,title,content,published,created_at').eq('published',true).order('created_at',{ascending:false});
+ const nr=await sb.from('news').select('id,title,content,published,created_at').eq('published',true).order('created_at',{ascending:true});
  if(!nr.error&&nr.data&&nr.data.length)db.news=nr.data.map(n=>({id:n.id,type:'hint',title:n.title,body:n.content,comments:[]}));
  $('auth').classList.add('hidden');$('a-err').textContent='';render();sv();
  chatPresence();autoRoom();if(!U().tutDone)setTimeout(startTut,500);
@@ -192,7 +192,7 @@ async function signup(){
  }catch(e){$('a-err').textContent=e.message||'สมัครสมาชิกไม่สำเร็จ'}
 }
 async function logout(){
- if(cloudUid&&U()){clearTimeout(cloudSaveTimer);await saveCloudState()}
+ if(cloudUid&&U()){clearTimeout(cloudSaveTimer);while(cloudSaveBusy)await new Promise(r=>setTimeout(r,60));clearTimeout(cloudSaveTimer);await saveCloudState();while(cloudSaveBusy)await new Promise(r=>setTimeout(r,60))}
  admin=false;closeCreator();hideTut();netStop();lastPres='';if(chatRoom)chatRoom.presence({n:null,av:null}).catch(()=>{});gm=null;clearInterval(gi);
  await sb.auth.signOut();cloudUid=null;cloudReady=false;activeUid=null;db.cur=null;me=null;db.users={};sv();$('auth').classList.remove('hidden');chatWith=null;
 }

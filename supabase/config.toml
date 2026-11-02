@@ -1,0 +1,2 @@
+[functions.register-player]
+verify_jwt = false

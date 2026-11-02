@@ -734,7 +734,7 @@ function netPanel(){
  if(net.want)return `<div class="card mb-2 text-xs">👥 ห้องเพื่อน: <b>${esc(net.room)}</b> · <button onclick="netLeave()" class="underline">ออกจากห้อง</button></div>`;
  return `<div class="card mb-2"><b class="text-sm">👥 เล่นกับเพื่อน</b><p class="text-[11px] text-gray-600 my-1">ตั้ง <b>รหัสห้อง</b> เดียวกันกับเพื่อน (อย่างน้อย 4 ตัว ควรเดายาก) แล้วคุยกันได้ทันที ข้อความถูกเข้ารหัสด้วยรหัสห้องก่อนส่ง · ใช้เซิร์ฟเวอร์สาธารณะฟรี อาจช้าหรือล่มได้</p><div class="flex gap-2"><input id="room-in" maxlength="30" placeholder="เช่น lak-yah-2026" class="flex-1 px-3 py-2 text-sm rounded-xl border border-p3"><button onclick="netJoin($('room-in').value)" class="btn bg-vblue text-white">เข้าห้อง</button></div></div>`;
 }
-function equip(k,v){U()[k]=v;sv();chatPresence();render()}
+function equip(k,v){U()[k]=v;if(k==='av')delete U().customAvatar;sv();chatPresence();render()}
 function vAvatar(){
  const u=U();
  return `<div class="grid md:grid-cols-3 gap-4"><div class="card text-center py-6"><div class="w-28 h-28 mx-auto rounded-2xl bg-white text-6xl f-${u.fr} pch-avatar-frame">${avatarMarkup(u)}</div>

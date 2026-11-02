@@ -13,4 +13,12 @@ android {
         versionCode 1
         versionName '1.0'
     }
+
+    buildTypes {
+        release {
+            // Release build is currently unsigned; signing will be configured securely
+            // with a guardian-managed keystore before public distribution.
+            minifyEnabled false
+        }
+    }
 }

@@ -159,11 +159,11 @@ begin
     if v_code.reward_type <> 'none' and v_code.reward_value is not null then
       v_reward:=jsonb_build_object('type',v_code.reward_type,'value',v_code.reward_value,'qty',v_code.reward_qty);
       if v_code.reward_type='avatar' then
-        v_state:=jsonb_set(v_state,'{avs}',(select to_jsonb(array(select distinct x from unnest(array(select jsonb_array_elements_text(coalesce(v_state->'avs','[]'::jsonb))) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) x))),true);
+        v_state:=jsonb_set(v_state,'{avs}',(select to_jsonb(array(select distinct val from unnest(coalesce(array(select jsonb_array_elements_text(coalesce(v_state->'avs','[]'::jsonb))),ARRAY[]::text[]) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) as u(val))),true);
       elsif v_code.reward_type='frame' then
-        v_state:=jsonb_set(v_state,'{frs}',(select to_jsonb(array(select distinct x from unnest(array(select jsonb_array_elements_text(coalesce(v_state->'frs','["none"]'::jsonb))) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) x))),true);
+        v_state:=jsonb_set(v_state,'{frs}',(select to_jsonb(array(select distinct val from unnest(coalesce(array(select jsonb_array_elements_text(coalesce(v_state->'frs','["none"]'::jsonb))),ARRAY[]::text[]) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) as u(val))),true);
       elsif v_code.reward_type='title' then
-        v_state:=jsonb_set(v_state,'{tts}',(select to_jsonb(array(select distinct x from unnest(array(select jsonb_array_elements_text(coalesce(v_state->'tts','["มือใหม่ถอดรหัส"]'::jsonb))) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) x))),true);
+        v_state:=jsonb_set(v_state,'{tts}',(select to_jsonb(array(select distinct val from unnest(coalesce(array(select jsonb_array_elements_text(coalesce(v_state->'tts','["มือใหม่ถอดรหัส"]'::jsonb))),ARRAY[]::text[]) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) as u(val))),true);
       elsif v_code.reward_type='card' then
         v_state:=jsonb_set(v_state,'{cards}',jsonb_set(coalesce(v_state->'cards','{}'::jsonb),array[v_code.reward_value],to_jsonb(coalesce((v_state->'cards'->>v_code.reward_value)::integer,0)+v_code.reward_qty),true),true);
       end if;

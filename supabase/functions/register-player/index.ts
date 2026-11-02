@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
     const admin = createClient(url, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
-    const email = `${normalized}@players.paper-code-hunter.invalid`;
+    const email = `${normalized}@players.papercodehunter.com`;
     const { data, error } = await admin.auth.admin.createUser({
       email,
       password: pass,

@@ -90,7 +90,7 @@ textarea{max-height:10rem!important}
   <h2 class="text-xl font-bold mb-1">เข้าสู่สมุดบันทึก</h2>
   <p class="text-xs text-gray-600 mb-4">สมัครสมาชิกด้วยอีเมลของคุณ</p>
   <input id="a-email" type="email" autocomplete="email" placeholder="อีเมล" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
-  <input id="a-name" maxlength="14" autocomplete="nickname" placeholder="ชื่อผู้เล่น" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <input id="a-name" maxlength="14" autocomplete="nickname" placeholder="ชื่อผู้เล่น (ใช้ตอนสมัคร)" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
   <input id="a-pw" type="password" autocomplete="current-password" placeholder="รหัสผ่าน" class="w-full mb-3 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
   <button onclick="login()" class="btn w-full bg-vgold text-p9 py-2 mb-2">เข้าสู่ระบบ</button>
   <button onclick="signup()" class="btn w-full bg-p3 text-white py-2">สมัครสมาชิก</button>
@@ -112,6 +112,10 @@ textarea{max-height:10rem!important}
 
 <script>
 const $=id=>document.getElementById(id);
+const SUPABASE_URL='https://irexyywxoktci.supabase.co';
+const SUPABASE_KEY='sb_publishable_N9OgYUnONMGYBn9kblHeMA_LzPaI6mc';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let cloudUid=null,cloudReady=false,activeUid=null,cloudSaveTimer=null,cloudSaveBusy=false,cloudSavePending=false;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const AV=[['👤','มือใหม่',0],['🧙','พ่อมด',100],['🕵️','นักสืบ',150],['🦊','จิ้งจอก',200],['🐉','มังกร',400],['👑','ราชา',600],['🦄','ยูนิคอร์นหรู',1500],['⚡','เทพสายฟ้า',3000],['🌟','เทพเจ้าดารา',5000],['🐼','แพนด้าจอมเซียน',800],['🚀','นักบินอวกาศ',2000]];
 const FR=[['none','ไม่มีกรอบ',0],['ribbon','ริบบิ้นแดง',80],['scroll','ม้วนกระดาษ',150],['gold','กรอบทอง',200],['diamond','เพชรฟ้า',500],['rainbow','รุ้งประกาย',1200],['crown','มงกุฎทองคำแท้',3500],['neon','นีออนเรืองแสง',900]];
@@ -120,7 +124,16 @@ const KEYS=[[1,300],[3,900],[10,3000],[30,9000],[100,30000]];
 const REPLY=['ว่าไง! วันนี้ได้โค้ดอะไรบ้าง?','ระวังรหัสกับดักนะ 😱','ขอบคุณที่ทักมา!','เจอคำใบ้ใหม่แล้วบอกด้วยนะ 🔍','เมื่อกี้ถอดรหัสได้เหรียญเพียบ 🪙'];
 let db,me,tab='news',flt='all',chatWith=null,store={};
 const ld=()=>{try{return JSON.parse(localStorage.getItem('pch1'))}catch(e){return null}};
-const sv=()=>{try{localStorage.setItem('pch1',JSON.stringify(db))}catch(e){}};
+const sv=()=>{try{localStorage.setItem('pch1',JSON.stringify(db))}catch(e){}if(cloudUid&&cloudReady){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(saveCloudState,650)}};
+async function saveCloudState(){
+ if(!cloudUid||!cloudReady||!U())return;
+ if(cloudSaveBusy){cloudSavePending=true;return}
+ cloudSaveBusy=true;const uid=cloudUid;
+ try{const {error}=await sb.rpc('save_player_state',{p_state:JSON.parse(JSON.stringify(U()))});if(error)throw error}
+ catch(e){console.error('Cloud save failed',e);if(uid===cloudUid)toast('บันทึกออนไลน์ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต')}
+ finally{cloudSaveBusy=false;if(cloudSavePending){cloudSavePending=false;setTimeout(saveCloudState,250)}}
+}
+function freshPlayer(){return {coins:100,keys:3,av:'👤',fr:'none',title:'มือใหม่ถอดรหัส',avs:['👤'],frs:['none'],tts:['มือใหม่ถอดรหัส'],used:[],friends:[],chats:{},trophies:[],certs:0,coinsEarned:0}};
 db=ld()||{users:{},cur:null,codes:{PAPER2026:{coins:50},KEYMASTER:{keys:2},GOLDRUSH:{coins:100},TRAP999:{trap:1}},
 news:[
 {id:1,type:'code',title:'โค้ดประจำวัน!',body:'สมุดบันทึกแจกโค้ด: PAPER2026 รับเหรียญทันที',comments:[]},
@@ -130,22 +143,61 @@ news:[
 if(db.seedv!==2){[['MATHWIZ',{coins:80,mini:1}],['MEMORY77',{coins:30,keys:1,mini:1}],['SNIPER5',{coins:60,mini:1}],['WORDHUNT',{coins:70,mini:1}],['LUCKY100',{coins:100,mini:1}],['PAPERMAP',{coins:120,keys:1,mini:1}]].forEach(([c,d])=>{if(!db.codes[c])db.codes[c]=d});db.seedv=2;sv()}
 const U=()=>db.users[me];
 let admin=false;
-const isAdm=()=>admin&&me==='LA'&&!!U();
-const A_SALT='pch-admin-salt-v1',A_HASH='3f11363ea518c6b390c4ace742ebad7a8662d339d6b8c8295c990b42c9021749';
+const isAdm=()=>admin&&!!U();
 async function hp(p,s){const e=new TextEncoder(),k=await crypto.subtle.importKey('raw',e.encode(p),'PBKDF2',false,['deriveBits']);const b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode(s),iterations:150000,hash:'SHA-256'},k,256);return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const rs=()=>[...crypto.getRandomValues(new Uint8Array(8))].map(x=>x.toString(16).padStart(2,'0')).join('');
 async function chk(u,p){if(u.h)return await hp(p,u.s)===u.h;if(u.pw!==undefined&&u.pw===p){u.s=rs();u.h=await hp(p,u.s);delete u.pw;return true}return false}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.add('hidden'),2500)}
-async function login(){
- const n=$('a-name').value.trim(),p=$('a-pw').value;
- if(!n||!p){$('a-err').textContent='กรอกชื่อและรหัสผ่านให้ครบ';return}
- let u=db.users[n];const ns=rs();admin=false;
- if(n==='LA'){if(await hp(p,A_SALT)!==A_HASH){$('a-err').textContent='ชื่อนี้ถูกสงวนไว้ หรือรหัสผ่านไม่ถูกต้อง';return}admin=true}
- if(u){if(!admin&&!(await chk(u,p))){$('a-err').textContent='รหัสผ่านไม่ถูกต้อง';return}}
- else db.users[n]={s:ns,h:await hp(p,ns),coins:100,keys:3,av:'👤',fr:'none',title:'มือใหม่ถอดรหัส',avs:['👤'],frs:['none'],tts:['มือใหม่ถอดรหัส'],used:[],friends:[],chats:{},trophies:[]};
- me=n;db.cur=n;sv();$('auth').classList.add('hidden');$('a-err').textContent='';render();chatPresence();autoRoom();if(!U().tutDone)setTimeout(startTut,500);
+async function enterCloudUser(user){
+ if(!user)return;
+ const uid=user.id;if(activeUid===uid&&cloudReady)return;
+ activeUid=uid;cloudUid=uid;cloudReady=false;admin=false;
+ const [pr,ps]=await Promise.all([
+  sb.from('profiles').select('display_name').eq('id',uid).maybeSingle(),
+  sb.from('player_state').select('state').eq('user_id',uid).maybeSingle()
+ ]);
+ if(pr.error)throw pr.error;if(ps.error)throw ps.error;
+ const display=(pr.data&&pr.data.display_name)||user.user_metadata?.display_name||(user.email||'นักสืบ').split('@')[0];
+ me=String(display).trim().slice(0,14)||'นักสืบ';
+ const state=ps.data&&ps.data.state&&typeof ps.data.state==='object'?ps.data.state:{};
+ db.users={};db.users[me]=Object.assign(freshPlayer(),state);
+ const u=U();
+ ['avs','frs','tts','used','friends','trophies'].forEach(k=>{if(!Array.isArray(u[k]))u[k]=freshPlayer()[k]});
+ if(!u.chats||typeof u.chats!=='object')u.chats={};
+ if(!u.coins&&u.coins!==0)u.coins=100;if(!u.keys&&u.keys!==0)u.keys=3;
+ db.cur=null;cloudReady=true;
+ const ar=await sb.rpc('is_admin');admin=!ar.error&&ar.data===true;
+ $('auth').classList.add('hidden');$('a-err').textContent='';render();sv();
+ chatPresence();autoRoom();if(!U().tutDone)setTimeout(startTut,500);
 }
-function logout(){admin=false;closeCreator();hideTut();netStop();lastPres='';if(chatRoom)chatRoom.presence({n:null,av:null}).catch(()=>{});gm=null;clearInterval(gi);db.cur=null;sv();me=null;$('auth').classList.remove('hidden');chatWith=null}
+async function login(){
+ const email=$('a-email').value.trim(),p=$('a-pw').value;
+ if(!email||!p){$('a-err').textContent='กรอกอีเมลและรหัสผ่านให้ครบ';return}
+ $('a-err').textContent='กำลังเข้าสู่ระบบ...';
+ try{const {data,error}=await sb.auth.signInWithPassword({email,password:p});if(error)throw error;await enterCloudUser(data.user)}
+ catch(e){$('a-err').textContent=e.message||'เข้าสู่ระบบไม่สำเร็จ'}
+}
+async function signup(){
+ const email=$('a-email').value.trim(),name=$('a-name').value.trim(),p=$('a-pw').value;
+ if(!email||!name||!p){$('a-err').textContent='กรอกอีเมล ชื่อผู้เล่น และรหัสผ่านให้ครบ';return}
+ if(name.length>14){$('a-err').textContent='ชื่อผู้เล่นต้องไม่เกิน 14 ตัวอักษร';return}
+ if(p.length<6){$('a-err').textContent='รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';return}
+ $('a-err').textContent='กำลังสมัครสมาชิก...';
+ try{
+  const {data,error}=await sb.auth.signUp({email,password:p,options:{data:{display_name:name}}});if(error)throw error;
+  if(data.session&&data.user)await enterCloudUser(data.user);
+  else $('a-err').textContent='สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ';
+ }catch(e){$('a-err').textContent=e.message||'สมัครสมาชิกไม่สำเร็จ'}
+}
+async function logout(){
+ if(cloudUid&&U()){clearTimeout(cloudSaveTimer);await saveCloudState()}
+ admin=false;closeCreator();hideTut();netStop();lastPres='';if(chatRoom)chatRoom.presence({n:null,av:null}).catch(()=>{});gm=null;clearInterval(gi);
+ await sb.auth.signOut();cloudUid=null;cloudReady=false;activeUid=null;db.cur=null;me=null;db.users={};sv();$('auth').classList.remove('hidden');chatWith=null;
+}
+async function bootCloud(){
+ const {data,error}=await sb.auth.getSession();if(error)throw error;
+ if(data.session&&data.session.user)await enterCloudUser(data.session.user);
+}
 function trophy(t){if(!U().trophies.includes(t)){U().trophies.push(t);toast('🏆 ได้ถ้วยรางวัล: '+t)}}
 function setTab(t){tab=t;render()}
 function render(){
@@ -219,6 +271,7 @@ function vRedeem(){
  <div class="card text-left"><div class="font-bold text-sm mb-1">📜 ประวัติ (${h.length})</div><div class="text-xs font-mono space-y-1 max-h-40 overflow-y-auto">${h.length?h.slice().reverse().map(x=>`<div>${esc(x)}</div>`).join(''):'<i class="text-gray-500">ยังไม่มีประวัติ</i>'}</div></div></div>`;
 }
 function submitCode(){
+ if(cloudUid)return toast('ระบบแลกรางวัลออนไลน์กำลังตั้งค่าความปลอดภัย กรุณาลองใหม่ภายหลัง');
  const c=$('code-in').value.trim().toUpperCase();if(!c)return;
  const u=U(),d=db.codes[c];
  if(!d){toast('❌ ไม่พบรหัสนี้');return}
@@ -707,8 +760,7 @@ function saveSelf(){
 function addSelf(c,k){if(!isAdm())return;U().coins+=c;U().keys+=k;sv();render();drawCreator()}
 function delCode(c){if(!isAdm())return;delete db.codes[c];sv();toast('ลบโค้ด '+c+' แล้ว');drawCreator()}
 function delNews(id){if(!isAdm())return;db.news=db.news.filter(n=>n.id!==id);sv();render();if(!creator.classList.contains('hidden'))drawCreator()}
-if(db.cur&&db.cur!=='LA'&&db.users[db.cur]){me=db.cur;$('auth').classList.add('hidden');render()}
-initRoom().then(autoRoom);
+bootCloud().catch(e=>{console.error('Cloud startup failed',e);$('a-err').textContent='เชื่อมต่อระบบบัญชีไม่สำเร็จ กรุณาลองโหลดหน้าใหม่'}).finally(()=>initRoom().then(autoRoom));
 </script>
 </body>
 </html>

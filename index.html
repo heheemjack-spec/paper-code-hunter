@@ -237,9 +237,8 @@ async function signup(){
    try{const body=await error.context.json();if(body?.error)detail=body.error;}catch{}
    throw new Error('สมัครสมาชิกไม่สำเร็จ: '+detail);
   }
-  if(!data?.success)throw new Error(data?.error||'ระบบไม่ได้ยืนยันการสร้างบัญชี');
   $('a-email').value=username.toLowerCase();
-  $('a-err').textContent='สร้างบัญชีสำเร็จ กำลังเข้าสู่ระบบ...';
+  $('a-err').textContent='ส่งคำขอสมัครสมาชิกแล้ว กำลังตรวจสอบการเข้าสู่ระบบ...';
   const email=`${username.toLowerCase()}@players.papercodehunter.com`;
   const {data:authData,error:authError}=await sb.auth.signInWithPassword({email,password:p});
   if(authError)throw new Error('สร้างบัญชีสำเร็จแล้ว แต่เข้าสู่ระบบไม่สำเร็จ: '+authError.message+' กรุณาลองเข้าสู่ระบบอีกครั้ง');

@@ -381,7 +381,7 @@ async function applyCodeReward(u,r){
  else if(r.type==='title'){u.tts=Array.isArray(u.tts)?u.tts:['มือใหม่ถอดรหัส'];if(!u.tts.includes(r.value))u.tts.push(r.value)}
  else if(r.type==='card'){u.cards=u.cards||{};u.cards[r.value]=(u.cards[r.value]||0)+n}
 }
-function submitCode(){
+async function submitCode(){
  const c=$('code-in').value.trim().toUpperCase();if(!c)return;
  if(cloudUid){
   const {data,error}=await sb.rpc('redeem_player_code',{p_code:c});

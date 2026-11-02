@@ -28,7 +28,6 @@ create unique index if not exists pch_one_code_per_category
 alter table public.pch_redeem_codes enable row level security;
 alter table public.pch_code_redemptions enable row level security;
 revoke all on public.pch_redeem_codes, public.pch_code_redemptions from anon, authenticated;
-grant select,insert,update,delete on public.player_state to authenticated;
 
 -- Client-side state saves cannot alter economy or redemption history.
 create or replace function public.pch_guard_player_economy()

@@ -322,23 +322,24 @@ function extendCap(id){
 }
 
 const JOBS=[
- ['cipher','🧩','นักถอดรหัส','แก้ปริศนาประจำวันและส่งรายงาน',80],
- ['news','📰','ผู้ตรวจข่าว','ตรวจข่าวและจัดหมวดหมู่ข้อมูล',60],
- ['explore','🧭','นักสำรวจ','สำรวจแผนที่และบันทึกจุดสำคัญ',100],
- ['chat','💬','ผู้ช่วยชุมชน','ช่วยดูแลบรรยากาศห้องแชต',50],
- ['archive','📚','ผู้จัดคลังเอกสาร','จัดเรียงแฟ้มรหัสลับให้เป็นระเบียบ',70],
- ['tester','🎮','ผู้ทดสอบเกม','ทดสอบมินิเกมและรายงานผล',120],
- ['hint','🔎','นักเขียนคำใบ้','เขียนคำใบ้สั้น ๆ ให้ผู้เล่นคนอื่น',90]
+ ['cipher','🧩','นักถอดรหัส','แลกรหัสสำเร็จ 1 โค้ด',20,()=>codesOk(),1],
+ ['news','📰','ผู้ตรวจข่าว','แสดงความคิดเห็นในโพสต์ 1 ครั้ง',15,()=>stat('cm'),1],
+ ['explore','🧭','นักสำรวจ','ค้นพบโค้ดลับจากมินิเกม 1 ครั้ง',25,()=>((U().found||[]).length),1],
+ ['chat','💬','ผู้ช่วยชุมชน','แสดงความคิดเห็นช่วยชุมชนรวม 3 ครั้ง',25,()=>stat('cm'),3],
+ ['archive','📚','ผู้จัดคลังเอกสาร','แลกรหัสสำเร็จรวม 3 โค้ด',30,()=>codesOk(),3],
+ ['tester','🎮','ผู้ทดสอบเกม','เล่นมินิเกมจบ 2 รอบ',30,()=>stat('games'),2],
+ ['hint','🔎','นักเขียนคำใบ้','ตอบคำในเกมเรียงคำถูก 4 คำ',25,()=>stat('word'),4]
 ];
+function jobProgress(id){const j=JOBS.find(x=>x[0]===id);return j?Math.min(j[5](),j[6]):0}
 function vJobs(){
  const u=U(),claims=u.job_claims||{},now=Date.now();
- return `<div class="max-w-xl mx-auto space-y-3"><div class="card text-center"><div class="text-4xl">💼</div><h2 class="text-2xl font-bold">ศูนย์จัดหางาน</h2><p class="text-xs text-gray-600 mt-1">เลือกงานที่สนใจ รับเหรียญเมื่อส่งงานสำเร็จ แต่ละงานทำได้ 1 ครั้งทุก 24 ชั่วโมง</p><div class="text-lg font-bold text-vgold mt-2">ยอดเงิน 🪙${u.coins}</div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${JOBS.map(j=>{const last=claims[j[0]]?new Date(claims[j[0]]).getTime():0,left=Math.max(0,last+86400000-now);return `<div class="card"><div class="flex items-start gap-2"><div class="text-3xl">${j[1]}</div><div class="min-w-0 flex-1"><b>${j[2]}</b><p class="text-xs text-gray-600 mt-1">${j[3]}</p></div></div><div class="flex items-center justify-between mt-3"><b class="text-vgold">รางวัล 🪙${j[4]}</b>${left>0?`<span class="text-xs text-gray-500">พักงานอีก ${fmtT(Math.ceil(left/1000))}</span>`:`<button onclick="claimJob('${j[0]}')" class="btn bg-vgold text-p9">รับงาน</button>`}</div></div>`}).join('')}</div><p class="text-[11px] text-gray-500 text-center">เวลาพักงานนับจากเซิร์ฟเวอร์ ป้องกันการปรับเวลาเครื่องเพื่อรับรางวัลซ้ำ</p></div>`;
+ return `<div class="max-w-xl mx-auto space-y-3"><div class="card text-center"><div class="text-4xl">💼</div><h2 class="text-2xl font-bold">ศูนย์จัดหางาน</h2><p class="text-xs text-gray-600 mt-1">ต้องทำเป้าหมายให้ครบก่อนจึงส่งงานรับค่าจ้างได้ · แต่ละงานพัก 24 ชั่วโมง</p><div class="text-lg font-bold text-vgold mt-2">ยอดเงิน 🪙${u.coins}</div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${JOBS.map(j=>{const last=claims[j[0]]?new Date(claims[j[0]]).getTime():0,left=Math.max(0,last+86400000-now),p=jobProgress(j[0]),done=p>=j[6];return `<div class="card"><div class="flex items-start gap-2"><div class="text-3xl">${j[1]}</div><div class="min-w-0 flex-1"><b>${j[2]}</b><p class="text-xs text-gray-600 mt-1">${j[3]}</p></div></div><div class="mt-3"><div class="flex justify-between text-xs mb-1"><span>ความคืบหน้า</span><b>${p}/${j[6]}</b></div><div class="h-2 bg-p2 rounded-full overflow-hidden"><div class="h-full bg-vgold" style="width:${p/j[6]*100}%"></div></div></div><div class="flex items-center justify-between mt-3"><b class="text-vgold">รางวัล 🪙${j[4]}</b>${left>0?`<span class="text-xs text-gray-500">พักงานอีก ${fmtT(Math.ceil(left/1000))}</span>`:done?`<button onclick="claimJob('${j[0]}')" class="btn bg-vgold text-p9">ส่งงานรับเงิน</button>`:`<button disabled class="btn bg-p2 text-gray-500">ยังทำไม่ครบ</button>`}</div></div>`}).join('')}</div><p class="text-[11px] text-gray-500 text-center">เซิร์ฟเวอร์ตรวจเป้าหมายซ้ำก่อนจ่ายเงิน · รับค่าจ้างได้เมื่อผ่านเงื่อนไขเท่านั้น</p></div>`;
 }
 async function claimJob(id){
  if(!cloudUid)return toast('ระบบงานต้องเข้าสู่ระบบออนไลน์ก่อน');
  const {data,error}=await sb.rpc('pch_job_claim',{p_job:id});
  if(error)return toast(error.message||'รับรางวัลไม่สำเร็จ');
- if(!data||data.success!==true)return toast(data?.message||'ยังรับงานนี้ไม่ได้');
+ if(!data||data.success!==true)return toast(data?.message||'ยังส่งงานไม่ได้');
  const u=U();u.coins=data.coins;u.job_claims=data.job_claims||u.job_claims||{};sv();toast(data.message||'รับค่าจ้างสำเร็จ');render();
 }
 function vBank(){
@@ -515,7 +516,7 @@ function memTap(s){
 }
 function wordGo(skip){
  const g=gm,i=$('wans');if(!g)return;
- if(!skip&&i&&i.value.trim().toUpperCase()===g.ws[g.i]){g.ok++;toast('✅ ถูกต้อง!')}else toast('❌ คำที่ถูกคือ '+g.ws[g.i]);
+ if(!skip&&i&&i.value.trim().toUpperCase()===g.ws[g.i]){g.ok++;bump('word');toast('✅ ถูกต้อง!')}else toast('❌ คำที่ถูกคือ '+g.ws[g.i]);
  g.i++;if(g.i>=5)return endG(g.ok*4,g.ok>=4,`ตอบถูก ${g.ok}/5 คำ`);
  g.sc=scr(g.ws[g.i]);drawGame();
 }

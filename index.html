@@ -237,11 +237,15 @@ async function signup(){
    try{const body=await error.context.json();if(body?.error)detail=body.error;}catch{}
    throw new Error('สมัครสมาชิกไม่สำเร็จ: '+detail);
   }
+  if(!data || data.success!==true){
+   const detail=data?.error||data?.message||'ฟังก์ชันตอบกลับว่าไม่ได้สร้างบัญชี (ไม่มี success:true)';
+   throw new Error('ระบบสมัครสมาชิกยังสร้างบัญชีไม่สำเร็จ: '+detail+' กรุณาตรวจสอบ Edge Function register-player บน Supabase');
+  }
   $('a-email').value=username.toLowerCase();
-  $('a-err').textContent='ส่งคำขอสมัครสมาชิกแล้ว กำลังตรวจสอบการเข้าสู่ระบบ...';
+  $('a-err').textContent='สร้างบัญชีแล้ว กำลังเข้าสู่ระบบ...';
   const email=`${username.toLowerCase()}@players.papercodehunter.com`;
   const {data:authData,error:authError}=await sb.auth.signInWithPassword({email,password:p});
-  if(authError)throw new Error('สร้างบัญชีสำเร็จแล้ว แต่เข้าสู่ระบบไม่สำเร็จ: '+authError.message+' กรุณาลองเข้าสู่ระบบอีกครั้ง');
+  if(authError)throw new Error('สร้างบัญชีแล้ว แต่เข้าสู่ระบบไม่สำเร็จ: '+authError.message+' กรุณาลองเข้าสู่ระบบอีกครั้ง');
   await enterCloudUser(authData.user);
  }catch(e){
   console.error('Paper Code Hunter signup error:',e);

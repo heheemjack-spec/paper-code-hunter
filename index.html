@@ -261,10 +261,10 @@ function setTab(t){tab=t;render()}
 function render(){
  const u=U(),isA=isAdm();
  $('hdr').innerHTML=`<div class="flex items-center gap-2 bg-p9/80 px-3 py-1.5 rounded-xl border border-vgold/40"><span class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-p1 text-2xl">${avatarMarkup(u)}</span><div><b>${esc(me)}</b><div class="${u.coins<0?'text-red-400':'text-vgold'}">🪙${u.coins} 🔑${u.keys} 🎫${u.certs||0}</div></div></div><button class="btn bg-p3 text-p9" onclick="logout()">ออก</button>`;
- const T=[['news','📰 ข่าวสาร'],['redeem','🔑 ถอดรหัส'],['bank','🏦 ธนาคาร'],['shop','🛒 ร้านค้า'],['avatar','👔 อวตาร์'],['friends','👥 เพื่อนบอท'],['chat','💬 แชตรวม'],['mission','🎯 ภารกิจ'],['earn','💼 หาเหรียญ'],['game','🎮 มินิเกม'],['inv','🎒 คลัง'],['rules','📜 กฎ/สอนเล่น']];
+ const T=[['news','📰 ข่าวสาร'],['redeem','🔑 ถอดรหัส'],['bank','🏦 ธนาคาร'],['jobs','💼 งานพิเศษ'],['shop','🛒 ร้านค้า'],['avatar','👔 อวตาร์'],['friends','👥 เพื่อนบอท'],['chat','💬 แชตรวม'],['mission','🎯 ภารกิจ'],['earn','💼 หาเหรียญ'],['game','🎮 มินิเกม'],['inv','🎒 คลัง'],['rules','📜 กฎ/สอนเล่น']];
  $('tabs').innerHTML=T.map(([k,l])=>`<button id="tb-${k}" data-l="${l}" onclick="setTab('${k}')" class="btn ${tab===k?'bg-vgold text-p9 shadow':'hover:bg-p2'}">${l}</button>`).join('')+(isA?`<button onclick="openCreator()" class="btn ml-auto bg-purple-700 text-white">🛠️ ผู้สร้าง</button>`:'');
  const prev=$('view').scrollTop;
- $('view').innerHTML=({news:vNews,redeem:vRedeem,bank:vBank,shop:vShop,avatar:vAvatar,friends:vFriends,chat:vChat,rules:vRules,mission:vMission,earn:vEarn,game:vGame,inv:vInv})[tab]();
+ $('view').innerHTML=({news:vNews,redeem:vRedeem,bank:vBank,jobs:vJobs,shop:vShop,avatar:vAvatar,friends:vFriends,chat:vChat,rules:vRules,mission:vMission,earn:vEarn,game:vGame,inv:vInv})[tab]();
  if(tab==='friends')bindChat();if(tab==='chat'){unread=0;chatMount()}badge();
 }
 const TY={code:['🎁','text-vblue'],warning:['⚠️','text-vred'],hint:['🔍','text-vgold'],player:['💬','text-purple-700']};
@@ -321,6 +321,26 @@ function extendCap(id){
  u.coins-=c;n.cap=70;sv();toast('➕ เพิ่มโควต้าเป็น 70 แล้ว');render();
 }
 
+const JOBS=[
+ ['cipher','🧩','นักถอดรหัส','แก้ปริศนาประจำวันและส่งรายงาน',80],
+ ['news','📰','ผู้ตรวจข่าว','ตรวจข่าวและจัดหมวดหมู่ข้อมูล',60],
+ ['explore','🧭','นักสำรวจ','สำรวจแผนที่และบันทึกจุดสำคัญ',100],
+ ['chat','💬','ผู้ช่วยชุมชน','ช่วยดูแลบรรยากาศห้องแชต',50],
+ ['archive','📚','ผู้จัดคลังเอกสาร','จัดเรียงแฟ้มรหัสลับให้เป็นระเบียบ',70],
+ ['tester','🎮','ผู้ทดสอบเกม','ทดสอบมินิเกมและรายงานผล',120],
+ ['hint','🔎','นักเขียนคำใบ้','เขียนคำใบ้สั้น ๆ ให้ผู้เล่นคนอื่น',90]
+];
+function vJobs(){
+ const u=U(),claims=u.job_claims||{},now=Date.now();
+ return `<div class="max-w-xl mx-auto space-y-3"><div class="card text-center"><div class="text-4xl">💼</div><h2 class="text-2xl font-bold">ศูนย์จัดหางาน</h2><p class="text-xs text-gray-600 mt-1">เลือกงานที่สนใจ รับเหรียญเมื่อส่งงานสำเร็จ แต่ละงานทำได้ 1 ครั้งทุก 24 ชั่วโมง</p><div class="text-lg font-bold text-vgold mt-2">ยอดเงิน 🪙${u.coins}</div></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${JOBS.map(j=>{const last=claims[j[0]]?new Date(claims[j[0]]).getTime():0,left=Math.max(0,last+86400000-now);return `<div class="card"><div class="flex items-start gap-2"><div class="text-3xl">${j[1]}</div><div class="min-w-0 flex-1"><b>${j[2]}</b><p class="text-xs text-gray-600 mt-1">${j[3]}</p></div></div><div class="flex items-center justify-between mt-3"><b class="text-vgold">รางวัล 🪙${j[4]}</b>${left>0?`<span class="text-xs text-gray-500">พักงานอีก ${fmtT(Math.ceil(left/1000))}</span>`:`<button onclick="claimJob('${j[0]}')" class="btn bg-vgold text-p9">รับงาน</button>`}</div></div>`}).join('')}</div><p class="text-[11px] text-gray-500 text-center">เวลาพักงานนับจากเซิร์ฟเวอร์ ป้องกันการปรับเวลาเครื่องเพื่อรับรางวัลซ้ำ</p></div>`;
+}
+async function claimJob(id){
+ if(!cloudUid)return toast('ระบบงานต้องเข้าสู่ระบบออนไลน์ก่อน');
+ const {data,error}=await sb.rpc('pch_job_claim',{p_job:id});
+ if(error)return toast(error.message||'รับรางวัลไม่สำเร็จ');
+ if(!data||data.success!==true)return toast(data?.message||'ยังรับงานนี้ไม่ได้');
+ const u=U();u.coins=data.coins;u.job_claims=data.job_claims||u.job_claims||{};sv();toast(data.message||'รับค่าจ้างสำเร็จ');render();
+}
 function vBank(){
  const u=U(),l=u.loan||null,bal=l?Number(l.balance)||0:0,due=l?new Date(l.due_at):null,late=l&&due&&Date.now()>due.getTime();
  return `<div class="max-w-xl mx-auto space-y-4"><div class="card text-center"><div class="text-5xl mb-2">🏦</div><h2 class="text-2xl font-bold">ธนาคาร Paper Code</h2><p class="text-xs text-gray-600 mt-1">กู้เหรียญในเกมเพื่อใช้ก่อน แล้วหาเหรียญมาชำระคืนพร้อมดอกเบี้ย</p><div class="mt-3 text-lg font-bold text-vgold">ยอดเงินของคุณ 🪙${u.coins}</div></div>

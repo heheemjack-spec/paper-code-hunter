@@ -62,7 +62,7 @@ begin
   'success',true,
   'coins',v_coins+v_reward,
   'job_claims',v_claims,
-  'message','ส่งงานสำเร็จ: '..v_title||' · ได้รับค่าจ้าง '||v_reward||' เหรียญ'
+  'message','ส่งงานสำเร็จ: '||v_title||' · ได้รับค่าจ้าง '||v_reward||' เหรียญ'
  );
 end;
 $$;

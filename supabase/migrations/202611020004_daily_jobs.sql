@@ -30,8 +30,8 @@ begin
   when 'cipher' then
    v_title:='นักถอดรหัส'; v_reward:=20; v_required:=1;
    select count(*)::integer into v_codes
-   from jsonb_array_elements_text(coalesce(v_state->'used','[]'::jsonb)) x
-   where x like '%→ +%';
+   from jsonb_array_elements_text(coalesce(v_state->'used','[]'::jsonb)) as t(item)
+   where t.item like '%→ +%';
    v_progress:=v_codes;
   when 'news' then
    v_title:='ผู้ตรวจข่าว'; v_reward:=15; v_required:=1;

@@ -261,10 +261,10 @@ function setTab(t){tab=t;render()}
 function render(){
  const u=U(),isA=isAdm();
  $('hdr').innerHTML=`<div class="flex items-center gap-2 bg-p9/80 px-3 py-1.5 rounded-xl border border-vgold/40"><span class="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-p1 text-2xl">${avatarMarkup(u)}</span><div><b>${esc(me)}</b><div class="${u.coins<0?'text-red-400':'text-vgold'}">🪙${u.coins} 🔑${u.keys} 🎫${u.certs||0}</div></div></div><button class="btn bg-p3 text-p9" onclick="logout()">ออก</button>`;
- const T=[['news','📰 ข่าวสาร'],['redeem','🔑 ถอดรหัส'],['shop','🛒 ร้านค้า'],['avatar','👔 อวตาร์'],['friends','👥 เพื่อนบอท'],['chat','💬 แชตรวม'],['mission','🎯 ภารกิจ'],['earn','💼 หาเหรียญ'],['game','🎮 มินิเกม'],['inv','🎒 คลัง'],['rules','📜 กฎ/สอนเล่น']];
+ const T=[['news','📰 ข่าวสาร'],['redeem','🔑 ถอดรหัส'],['bank','🏦 ธนาคาร'],['shop','🛒 ร้านค้า'],['avatar','👔 อวตาร์'],['friends','👥 เพื่อนบอท'],['chat','💬 แชตรวม'],['mission','🎯 ภารกิจ'],['earn','💼 หาเหรียญ'],['game','🎮 มินิเกม'],['inv','🎒 คลัง'],['rules','📜 กฎ/สอนเล่น']];
  $('tabs').innerHTML=T.map(([k,l])=>`<button id="tb-${k}" data-l="${l}" onclick="setTab('${k}')" class="btn ${tab===k?'bg-vgold text-p9 shadow':'hover:bg-p2'}">${l}</button>`).join('')+(isA?`<button onclick="openCreator()" class="btn ml-auto bg-purple-700 text-white">🛠️ ผู้สร้าง</button>`:'');
  const prev=$('view').scrollTop;
- $('view').innerHTML=({news:vNews,redeem:vRedeem,shop:vShop,avatar:vAvatar,friends:vFriends,chat:vChat,rules:vRules,mission:vMission,earn:vEarn,game:vGame,inv:vInv})[tab]();
+ $('view').innerHTML=({news:vNews,redeem:vRedeem,bank:vBank,shop:vShop,avatar:vAvatar,friends:vFriends,chat:vChat,rules:vRules,mission:vMission,earn:vEarn,game:vGame,inv:vInv})[tab]();
  if(tab==='friends')bindChat();if(tab==='chat'){unread=0;chatMount()}badge();
 }
 const TY={code:['🎁','text-vblue'],warning:['⚠️','text-vred'],hint:['🔍','text-vgold'],player:['💬','text-purple-700']};
@@ -321,6 +321,30 @@ function extendCap(id){
  u.coins-=c;n.cap=70;sv();toast('➕ เพิ่มโควต้าเป็น 70 แล้ว');render();
 }
 
+function vBank(){
+ const u=U(),l=u.loan||null,bal=l?Number(l.balance)||0:0,due=l?new Date(l.due_at):null,late=l&&due&&Date.now()>due.getTime();
+ return `<div class="max-w-xl mx-auto space-y-4"><div class="card text-center"><div class="text-5xl mb-2">🏦</div><h2 class="text-2xl font-bold">ธนาคาร Paper Code</h2><p class="text-xs text-gray-600 mt-1">กู้เหรียญในเกมเพื่อใช้ก่อน แล้วหาเหรียญมาชำระคืนพร้อมดอกเบี้ย</p><div class="mt-3 text-lg font-bold text-vgold">ยอดเงินของคุณ 🪙${u.coins}</div></div>
+ ${l?`<div class="card border-2 ${late?'border-red-400':'border-vgold'}"><h3 class="font-bold mb-2">📄 สัญญาเงินกู้ที่กำลังใช้งาน</h3><div class="grid grid-cols-2 gap-2 text-sm"><div>เงินต้น: <b>🪙${Number(l.principal)||0}</b></div><div>ดอกเบี้ย: <b>10%</b></div><div>ยอดคงเหลือ: <b class="text-vred">🪙${bal}</b></div><div>ครบกำหนด: <b>${due?due.toLocaleString('th-TH'): '-'}</b></div></div><p class="text-xs mt-2 ${late?'text-red-600':'text-gray-500'}">${late?'เกินกำหนดแล้ว · กรุณาชำระหนี้':'กำหนดชำระภายใน 7 วัน'}</p><div class="flex gap-2 mt-3"><input id="bank-repay-amount" type="number" min="1" max="${Math.min(bal,Math.max(0,u.coins))}" step="1" placeholder="จำนวนเหรียญที่จะคืน" class="flex-1 min-w-0 px-3 py-2 rounded-xl border-2 border-p3"><button onclick="bankRepay()" class="btn bg-green-600 text-white" ${u.coins<1?'disabled':''}>ชำระคืน</button></div><p class="text-[11px] text-gray-500 mt-1">ชำระบางส่วนได้ แต่ต้องคืนครบก่อนจึงจะกู้รอบใหม่ได้</p></div>`:`<div class="card"><h3 class="font-bold mb-2">💰 ขอสินเชื่อ</h3><p class="text-sm mb-2">เลือกกู้ 100–1,000 เหรียญ · ดอกเบี้ยคงที่ 10% · ชำระคืนภายใน 7 วัน</p><label class="text-xs font-bold">จำนวนเงินกู้</label><select id="bank-loan-amount" class="w-full mt-1 px-3 py-2 rounded-xl border-2 border-p3">${[100,200,300,400,500,600,700,800,900,1000].map(n=>`<option value="${n}">${n} เหรียญ → ต้องคืน ${Math.ceil(n*1.1)} เหรียญ</option>`).join('')}</select><button onclick="bankBorrow()" class="btn w-full bg-vgold text-p9 mt-3">🏦 ยืนยันกู้เงิน</button><p class="text-[11px] text-gray-500 mt-2">กู้ได้ครั้งละ 1 สัญญา และต้องชำระหนี้เดิมก่อนจึงกู้ใหม่ได้</p></div>`}
+ <div class="card text-xs text-gray-600"><b>เงื่อนไขธนาคาร</b><ul class="list-disc pl-5 mt-1 space-y-1"><li>เป็นเหรียญในเกมเท่านั้น ไม่มีเงินจริง</li><li>ดอกเบี้ย 10% คิดครั้งเดียวจากเงินต้น</li><li>ระบบบันทึกหนี้บนเซิร์ฟเวอร์ ป้องกันการแก้ยอดจากหน้าเกม</li><li>หากเลยกำหนด จะระงับการกู้ใหม่จนกว่าจะชำระครบ</li></ul></div></div>`;
+}
+async function bankBorrow(){
+ if(!cloudUid)return toast('ระบบธนาคารต้องเข้าสู่ระบบออนไลน์ก่อน');
+ const el=$('bank-loan-amount'),amount=Number(el&&el.value);
+ if(!Number.isInteger(amount)||amount<100||amount>1000||amount%100)return toast('จำนวนเงินกู้ไม่ถูกต้อง');
+ const {data,error}=await sb.rpc('pch_bank_borrow',{p_amount:amount});
+ if(error)return toast(error.message||'ทำรายการกู้ไม่สำเร็จ');
+ if(!data||data.success!==true)return toast(data?.message||'ไม่สามารถกู้เงินได้');
+ const u=U();u.coins=data.coins;u.loan=data.loan;sv();toast('อนุมัติเงินกู้ +' + amount + ' เหรียญ · ยอดชำระ ' + data.loan.balance);render();
+}
+async function bankRepay(){
+ if(!cloudUid)return toast('ระบบธนาคารต้องเข้าสู่ระบบออนไลน์ก่อน');
+ const amount=Number($('bank-repay-amount')?.value);
+ if(!Number.isSafeInteger(amount)||amount<1)return toast('กรอกจำนวนเหรียญที่ต้องการคืนให้ถูกต้อง');
+ const {data,error}=await sb.rpc('pch_bank_repay',{p_amount:amount});
+ if(error)return toast(error.message||'ชำระคืนไม่สำเร็จ');
+ if(!data||data.success!==true)return toast(data?.message||'ชำระคืนไม่สำเร็จ');
+ const u=U();u.coins=data.coins;u.loan=data.loan||null;sv();toast(data.message||'ชำระคืนสำเร็จ');render();
+}
 function vRedeem(){
  const h=U().used;
  return `<div class="max-w-md mx-auto text-center py-4"><div class="text-5xl mb-2">🗝️</div><h2 class="text-xl font-bold mb-1">ป้อนรหัสลับเพื่อรับรางวัล</h2>

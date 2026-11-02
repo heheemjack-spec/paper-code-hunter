@@ -167,6 +167,8 @@ async function enterCloudUser(user){
  if(!u.coins&&u.coins!==0)u.coins=100;if(!u.keys&&u.keys!==0)u.keys=3;
  db.cur=null;cloudReady=true;
  const ar=await sb.rpc('is_admin');admin=!ar.error&&ar.data===true;
+ const nr=await sb.from('news').select('id,title,content,published,created_at').eq('published',true).order('created_at',{ascending:false});
+ if(!nr.error&&nr.data&&nr.data.length)db.news=nr.data.map(n=>({id:n.id,type:'hint',title:n.title,body:n.content,comments:[]}));
  $('auth').classList.add('hidden');$('a-err').textContent='';render();sv();
  chatPresence();autoRoom();if(!U().tutDone)setTimeout(startTut,500);
 }
@@ -499,16 +501,16 @@ function catsPanel(){
  <div class="mt-4 space-y-2">${cats.map(c=>{const cs=Object.keys(db.codes).filter(k=>db.codes[k].cat===c);return `<div class="bg-p1 rounded-xl p-2"><div class="flex justify-between items-center"><b>📂 ${esc(c)} <span class="text-xs font-normal">(${cs.length} โค้ด)</span></b><button onclick="delCat('${esc(c)}')" class="text-vred text-xs">🗑️ ลบหมวด</button></div><div class="text-xs font-mono mt-1">${cs.length?cs.map(esc).join(', '):'<i class="text-gray-500">ยังไม่มีโค้ดในหมวดนี้</i>'}</div></div>`}).join('')||'<i class="text-xs text-gray-500">ยังไม่มีหมวด</i>'}</div>`;
 }
 function addCat(){
- if(!isAdm())return;
+ if(!isAdm())return;if(cloudUid)return toast('ระบบหมวดโค้ดออนไลน์ยังไม่พร้อม');
  const n=$('cat-name').value.replace(/['"\\<>&`$]/g,'').trim();
  if(!n)return toast('ใส่ชื่อหมวดก่อน');
  db.cats=db.cats||[];if(db.cats.includes(n))return toast('มีหมวดนี้แล้ว');
  db.cats.push(n);sv();toast('📂 เพิ่มหมวด '+n+' แล้ว');drawCreator();
 }
-function delCat(c){if(!isAdm())return;db.cats=(db.cats||[]).filter(x=>x!==c);Object.values(db.codes).forEach(d=>{if(d.cat===c)delete d.cat});sv();toast('ลบหมวดแล้ว (โค้ดในหมวดกลายเป็นไม่มีหมวด)');drawCreator()}
-function setCodeCat(c,v){if(!isAdm()||!db.codes[c])return;if(v)db.codes[c].cat=v;else delete db.codes[c].cat;sv();drawCreator()}
+function delCat(c){if(!isAdm())return;if(cloudUid)return toast('ระบบหมวดโค้ดออนไลน์ยังไม่พร้อม');db.cats=(db.cats||[]).filter(x=>x!==c);Object.values(db.codes).forEach(d=>{if(d.cat===c)delete d.cat});sv();toast('ลบหมวดแล้ว (โค้ดในหมวดกลายเป็นไม่มีหมวด)');drawCreator()}
+function setCodeCat(c,v){if(!isAdm()||!db.codes[c])return;if(cloudUid)return toast('ระบบหมวดโค้ดออนไลน์ยังไม่พร้อม');if(v)db.codes[c].cat=v;else delete db.codes[c].cat;sv();drawCreator()}
 const expT=d=>{if(!d.exp)return '';const l=d.exp-Date.now();if(l<=0)return ' <span class="text-vred">⌛หมดอายุแล้ว</span>';const m=Math.ceil(l/60000);return ' ⏳เหลือ '+(m>=1440?Math.floor(m/1440)+' วัน':m>=60?Math.floor(m/60)+' ชม.':m+' นาที')};
-function setCodeExp(c,v){if(!isAdm()||!db.codes[c]||!v)return;if(v==='none')delete db.codes[c].exp;else db.codes[c].exp=Date.now()+({h1:3600000,h6:21600000,d1:86400000,d7:604800000}[v]);sv();toast('⏳ ตั้งอายุโค้ดแล้ว');drawCreator()}
+function setCodeExp(c,v){if(!isAdm()||!db.codes[c]||!v)return;if(cloudUid)return toast('ระบบโค้ดออนไลน์ยังไม่พร้อม');if(v==='none')delete db.codes[c].exp;else db.codes[c].exp=Date.now()+({h1:3600000,h6:21600000,d1:86400000,d7:604800000}[v]);sv();toast('⏳ ตั้งอายุโค้ดแล้ว');drawCreator()}
 let chatRoom=null,chatPeers=[],chatOn=false,chatLog=[],unread=0,lastSend=0,tutI=-1,lastPres='';
 const PLAY_RULES=['โค้ดหนึ่งชุดแลกได้ <b>ครั้งเดียว</b>ต่อผู้เล่น และบางโค้ดมีวันหมดอายุ','โค้ดที่อยู่ <b>หมวดเดียวกัน</b> ใช้ได้เพียง 1 โค้ดต่อหมวด (นับรวมโค้ดกับดัก)','โค้ดกับดักหักของจริง เหรียญติดลบได้ และระหว่างติดลบจะซื้อของไม่ได้','มินิเกมต้องพัก <b>5 นาที</b> หลังจบแต่ละเกม',' เกมเปิดตู้เซฟต้องใช้ 🎫 บัตรรับรอง 1 ใบต่อรอบ (ใช้แล้วไม่คืนถ้าแพ้ ชนะมีโอกาส 50% ได้บัตรคืน)','คอมเมนต์ใช้ 🔑1 ต่อครั้ง · เขียนโพสต์ใช้ 🔑80 หรือ 🪙10,000 · แต่ละโพสต์รับคอมเมนต์จากผู้อื่นได้ 50 (ขยายเป็น 70 ได้ด้วย 🪙3,000)','สินค้าที่มี +🎫 ต้องใช้บัตรรับรองควบคู่กับเหรียญ','เล่นอย่างยุติธรรม ไม่แก้ข้อมูลในเครื่องหรือหาช่องโหว่เพื่อเอาเปรียบผู้อื่น'];
 const CHAT_RULES=['พูดจาสุภาพ ไม่ด่าทอ ไม่เหยียด ไม่คุกคามผู้อื่น','ห้ามสแปมหรือส่งข้อความซ้ำๆ (ระบบจำกัด 1 ข้อความต่อ 1.5 วินาที ยาวสุด 200 ตัวอักษร)','ห้ามเปิดเผยข้อมูลส่วนตัว เช่น เบอร์โทร อีเมล ที่อยู่ ของตัวเองหรือผู้อื่น','ห้ามแอบอ้างเป็นผู้สร้างหรือทีมงาน','ถ้ามีคนรบกวน กด 🚫 ข้างชื่อเพื่อบล็อกได้','แชตสดไม่เก็บย้อนหลัง คนที่เข้ามาทีหลังจะไม่เห็นข้อความเก่า'];
@@ -738,14 +740,18 @@ function drawCreator(){
  <b class="block mt-4">📰 ข่าวทั้งหมด (${db.news.length})</b><div class="mt-1 space-y-1">${db.news.map(n=>`<div class="flex items-center justify-between bg-p1 rounded-lg px-2 py-1"><span class="text-xs">${TY[n.type][0]} ${esc(n.title)}</span><button onclick="delNews(${n.id})" class="text-vred text-xs">🗑️ ลบ</button></div>`).join('')||'<i class="text-xs text-gray-500">ไม่มีข่าว</i>'}</div>`;
  $('ct-body').innerHTML=h;
 }
-function postNews(){
+async function postNews(){
  if(!isAdm())return;const ti=$('n-title').value.trim(),bo=$('n-body').value.trim();
  if(!ti||!bo)return toast('กรอกหัวข้อและเนื้อหาให้ครบ');
- db.news.push({id:Date.now(),type:$('n-type').value,title:ti,body:bo,comments:[],closed:$('n-closed').checked});
- sv();toast('📢 โพสต์ข่าวแล้ว');render();drawCreator();
+ if(cloudUid){
+  const {data,error}=await sb.from('news').insert({title:ti,content:bo,published:true}).select('id,title,content,published,created_at').single();
+  if(error)return toast('โพสต์ข่าวไม่สำเร็จ: '+error.message);
+  db.news.unshift({id:data.id,type:'hint',title:data.title,body:data.content,comments:[]});
+ }else db.news.push({id:Date.now(),type:$('n-type').value,title:ti,body:bo,comments:[],closed:$('n-closed').checked});
+ toast('📢 โพสต์ข่าวแล้ว');render();drawCreator();
 }
 function makeCode(){
- if(!isAdm())return;const c=$('k-code').value.trim().toUpperCase().replace(/[\s'"\\<>&`$]/g,'');
+ if(!isAdm())return;if(cloudUid)return toast('ระบบจัดการโค้ดออนไลน์ยังต้องตั้งค่า RPC ที่ปลอดภัยก่อน');const c=$('k-code').value.trim().toUpperCase().replace(/[\s'"\\<>&`$]/g,'');
  if(!c)return toast('ใส่ชื่อโค้ดก่อน');
  const trap=$('k-kind').value==='trap';
  db.codes[c]={coins:+$('k-coins').value||0,keys:+$('k-keys').value||0,certs:trap?0:(+$('k-certs').value||0)};if(trap)db.codes[c].trap=1;if($('k-mini')&&$('k-mini').checked&&!trap)db.codes[c].mini=1;const cg=$('k-cat')&&$('k-cat').value;if(cg)db.codes[c].cat=cg;
@@ -758,8 +764,12 @@ function saveSelf(){
  sv();toast('💾 บันทึกแล้ว');render();drawCreator();
 }
 function addSelf(c,k){if(!isAdm())return;U().coins+=c;U().keys+=k;sv();render();drawCreator()}
-function delCode(c){if(!isAdm())return;delete db.codes[c];sv();toast('ลบโค้ด '+c+' แล้ว');drawCreator()}
-function delNews(id){if(!isAdm())return;db.news=db.news.filter(n=>n.id!==id);sv();render();if(!creator.classList.contains('hidden'))drawCreator()}
+function delCode(c){if(!isAdm())return;if(cloudUid)return toast('ระบบจัดการโค้ดออนไลน์ยังต้องตั้งค่า RPC ที่ปลอดภัยก่อน');delete db.codes[c];sv();toast('ลบโค้ด '+c+' แล้ว');drawCreator()}
+async function delNews(id){
+ if(!isAdm())return;
+ if(cloudUid){const {error}=await sb.from('news').delete().eq('id',id);if(error)return toast('ลบข่าวไม่สำเร็จ: '+error.message)}
+ db.news=db.news.filter(n=>n.id!==id);render();if(!creator.classList.contains('hidden'))drawCreator();
+}
 bootCloud().catch(e=>{console.error('Cloud startup failed',e);$('a-err').textContent='เชื่อมต่อระบบบัญชีไม่สำเร็จ กรุณาลองโหลดหน้าใหม่'}).finally(()=>initRoom().then(autoRoom));
 </script>
 </body>

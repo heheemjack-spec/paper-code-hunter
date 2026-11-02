@@ -109,6 +109,7 @@ declare
   v_message text;
   v_count integer;
   v_reward jsonb;
+  v_i integer;
 begin
   if v_uid is null then return jsonb_build_object('success',false,'message','กรุณาเข้าสู่ระบบ'); end if;
   select * into v_code from public.pch_redeem_codes
@@ -159,11 +160,17 @@ begin
     if v_code.reward_type <> 'none' and v_code.reward_value is not null then
       v_reward:=jsonb_build_object('type',v_code.reward_type,'value',v_code.reward_value,'qty',v_code.reward_qty);
       if v_code.reward_type='avatar' then
-        v_state:=jsonb_set(v_state,'{avs}',(select to_jsonb(array(select distinct val from unnest(coalesce(array(select jsonb_array_elements_text(coalesce(v_state->'avs','[]'::jsonb))),ARRAY[]::text[]) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) as u(val))),true);
+        for v_i in 1..v_code.reward_qty loop
+          v_state:=jsonb_set(v_state,'{avs}',coalesce(v_state->'avs','[]'::jsonb)||jsonb_build_array(v_code.reward_value),true);
+        end loop;
       elsif v_code.reward_type='frame' then
-        v_state:=jsonb_set(v_state,'{frs}',(select to_jsonb(array(select distinct val from unnest(coalesce(array(select jsonb_array_elements_text(coalesce(v_state->'frs','["none"]'::jsonb))),ARRAY[]::text[]) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) as u(val))),true);
+        for v_i in 1..v_code.reward_qty loop
+          v_state:=jsonb_set(v_state,'{frs}',coalesce(v_state->'frs','["none"]'::jsonb)||jsonb_build_array(v_code.reward_value),true);
+        end loop;
       elsif v_code.reward_type='title' then
-        v_state:=jsonb_set(v_state,'{tts}',(select to_jsonb(array(select distinct val from unnest(coalesce(array(select jsonb_array_elements_text(coalesce(v_state->'tts','["มือใหม่ถอดรหัส"]'::jsonb))),ARRAY[]::text[]) || array_fill(v_code.reward_value,ARRAY[v_code.reward_qty])) as u(val))),true);
+        for v_i in 1..v_code.reward_qty loop
+          v_state:=jsonb_set(v_state,'{tts}',coalesce(v_state->'tts','["มือใหม่ถอดรหัส"]'::jsonb)||jsonb_build_array(v_code.reward_value),true);
+        end loop;
       elsif v_code.reward_type='card' then
         v_state:=jsonb_set(v_state,'{cards}',jsonb_set(coalesce(v_state->'cards','{}'::jsonb),array[v_code.reward_value],to_jsonb(coalesce((v_state->'cards'->>v_code.reward_value)::integer,0)+v_code.reward_qty),true),true);
       end if;

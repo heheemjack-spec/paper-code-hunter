@@ -88,12 +88,12 @@ textarea{max-height:10rem!important}
  <div class="sheet rounded-2xl p-6 w-full max-w-sm text-center">
   <div class="text-5xl mb-2">📜</div>
   <h2 class="text-xl font-bold mb-1">เข้าสู่สมุดบันทึก</h2>
-  <p class="text-xs text-gray-600 mb-4">สมัครสมาชิกด้วยอีเมลของคุณ</p>
-  <input id="a-email" type="text" autocomplete="username" placeholder="อีเมล หรือชื่อทีมงาน" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
-  <input id="a-name" maxlength="14" autocomplete="nickname" placeholder="ชื่อผู้เล่น (ใช้ตอนสมัคร)" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <p class="text-xs text-gray-600 mb-4">ใช้ชื่อผู้เล่นและรหัสผ่าน หรือเข้าเล่นแบบ Guest</p>
+  <input id="a-email" type="text" autocomplete="username" maxlength="14" placeholder="ชื่อผู้เล่น" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
+  <input id="a-name" maxlength="14" autocomplete="nickname" placeholder="ชื่อที่แสดงในเกม (ไม่บังคับ)" class="w-full mb-2 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
   <input id="a-pw" type="password" autocomplete="current-password" placeholder="รหัสผ่าน" class="w-full mb-3 px-3 py-2 rounded-xl border-2 border-p3 focus:outline-none focus:border-vgold">
   <button onclick="login()" class="btn w-full bg-vgold text-p9 py-2 mb-2">เข้าสู่ระบบ</button>
-  <button onclick="signup()" class="btn w-full bg-p3 text-white py-2">สมัครสมาชิก</button>
+  <button onclick="signup()" class="btn w-full bg-p3 text-p9 py-2">สมัครสมาชิก</button><button onclick="enterGuest()" class="btn w-full bg-white border border-p3 text-p9 py-2 mt-2">เข้าเล่นแบบ Guest</button>
 
   <p id="a-err" class="text-vred text-xs mt-2"></p>
  </div>
@@ -174,25 +174,35 @@ async function enterCloudUser(user){
 }
 async function login(){
  const entered=$('a-email').value.trim(),p=$('a-pw').value;
- const email=/^LA$/i.test(entered)?'la@paper-code-hunter.invalid':entered;
- if(!email||!p){$('a-err').textContent='กรอกอีเมลและรหัสผ่านให้ครบ';return}
+ if(!entered||!p){$('a-err').textContent='กรอกชื่อผู้เล่นและรหัสผ่านให้ครบ';return}
+ const email=/^LA$/i.test(entered)?'la@paper-code-hunter.invalid':`${entered.toLowerCase()}@players.paper-code-hunter.invalid`;
  $('a-err').textContent='กำลังเข้าสู่ระบบ...';
- try{const {data,error}=await sb.auth.signInWithPassword({email,password:p});if(error)throw error;await enterCloudUser(data.user)}
+ try{const {data,error}=await sb.auth.signInWithPassword({email,password:p});if(error)throw new Error('ชื่อผู้เล่นหรือรหัสผ่านไม่ถูกต้อง');await enterCloudUser(data.user)}
  catch(e){$('a-err').textContent=e.message||'เข้าสู่ระบบไม่สำเร็จ'}
 }
 async function signup(){
- const email=$('a-email').value.trim(),name=$('a-name').value.trim(),p=$('a-pw').value;
- if(!email||!name||!p){$('a-err').textContent='กรอกอีเมล ชื่อผู้เล่น และรหัสผ่านให้ครบ';return}
- if(name.length>14){$('a-err').textContent='ชื่อผู้เล่นต้องไม่เกิน 14 ตัวอักษร';return}
- if(p.length<6){$('a-err').textContent='รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';return}
+ const username=$('a-email').value.trim(),name=$('a-name').value.trim()||username,p=$('a-pw').value;
+ if(!username||!p){$('a-err').textContent='กรอกชื่อผู้เล่นและรหัสผ่านให้ครบ';return}
+ if(!/^[A-Za-z0-9_]{3,14}$/.test(username)){$('a-err').textContent='ชื่อผู้เล่นใช้ A-Z, 0-9, _ และยาว 3-14 ตัวอักษร';return}
+ if(p.length<8){$('a-err').textContent='รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร';return}
  $('a-err').textContent='กำลังสมัครสมาชิก...';
  try{
-  const {data,error}=await sb.auth.signUp({email,password:p,options:{data:{display_name:name}}});if(error)throw error;
-  if(data.session&&data.user)await enterCloudUser(data.user);
-  else $('a-err').textContent='สมัครสำเร็จ กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชีก่อนเข้าสู่ระบบ';
+  const {error}=await sb.functions.invoke('register-player',{body:{username:username.toLowerCase(),display_name:name,password:p}});
+  if(error)throw error;
+  $('a-email').value=username.toLowerCase();
+  await login();
  }catch(e){$('a-err').textContent=e.message||'สมัครสมาชิกไม่สำเร็จ'}
 }
+function enterGuest(){
+ if(cloudUid)return toast('กรุณาออกจากบัญชีออนไลน์ก่อน');
+ let guest='Guest_'+Math.random().toString(36).slice(2,8);
+ while(db.users[guest])guest='Guest_'+Math.random().toString(36).slice(2,8);
+ db.users[guest]=freshPlayer();me=guest;admin=false;cloudReady=false;activeUid=null;
+ $('auth').classList.add('hidden');$('a-err').textContent='';sv();render();
+ if(!U().tutDone)setTimeout(startTut,500);
+}
 async function logout(){
+ if(!cloudUid){admin=false;closeCreator();hideTut();me=null;db.cur=null;$('auth').classList.remove('hidden');$('hdr').innerHTML='';return}
  if(cloudUid&&U()){clearTimeout(cloudSaveTimer);while(cloudSaveBusy)await new Promise(r=>setTimeout(r,60));clearTimeout(cloudSaveTimer);await saveCloudState();while(cloudSaveBusy)await new Promise(r=>setTimeout(r,60))}
  admin=false;closeCreator();hideTut();netStop();lastPres='';if(chatRoom)chatRoom.presence({n:null,av:null}).catch(()=>{});gm=null;clearInterval(gi);
  await sb.auth.signOut();cloudUid=null;cloudReady=false;activeUid=null;db.cur=null;me=null;db.users={};sv();$('auth').classList.remove('hidden');chatWith=null;

@@ -124,15 +124,41 @@ const KEYS=[[1,300],[3,900],[10,3000],[30,9000],[100,30000]];
 const REPLY=['ว่าไง! วันนี้ได้โค้ดอะไรบ้าง?','ระวังรหัสกับดักนะ 😱','ขอบคุณที่ทักมา!','เจอคำใบ้ใหม่แล้วบอกด้วยนะ 🔍','เมื่อกี้ถอดรหัสได้เหรียญเพียบ 🪙'];
 let db,me,tab='news',flt='all',chatWith=null,store={};
 const ld=()=>{try{return JSON.parse(localStorage.getItem('pch1'))}catch(e){return null}};
-const sv=()=>{try{localStorage.setItem('pch1',JSON.stringify(db))}catch(e){}if(cloudUid&&cloudReady){clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(saveCloudState,650)}};
+const sv=()=>{
+ try{localStorage.setItem('pch1',JSON.stringify(db))}catch(e){}
+ if(cloudUid&&cloudReady){
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(()=>saveCloudState(),200);
+ }
+};
 async function saveCloudState(){
  if(!cloudUid||!cloudReady||!U())return;
  if(cloudSaveBusy){cloudSavePending=true;return}
- cloudSaveBusy=true;const uid=cloudUid;
- try{const {error}=await sb.rpc('save_player_state',{p_state:JSON.parse(JSON.stringify(U()))});if(error)throw error}
- catch(e){console.error('Cloud save failed',e);if(uid===cloudUid)toast('บันทึกออนไลน์ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต')}
- finally{cloudSaveBusy=false;if(cloudSavePending){cloudSavePending=false;setTimeout(saveCloudState,250)}}
+ cloudSaveBusy=true;
+ const uid=cloudUid;
+ const snapshot=JSON.parse(JSON.stringify(U()));
+ try{
+  const {error}=await sb.rpc('save_player_state',{p_state:snapshot});
+  if(error)throw error;
+  if(uid===cloudUid)cloudSavePending=false;
+ }catch(e){
+  console.error('Cloud save failed',e);
+  if(uid===cloudUid)toast('บันทึกออนไลน์ไม่สำเร็จ: '+(e.message||'กรุณาลองใหม่'));
+ }finally{
+  cloudSaveBusy=false;
+  if(cloudSavePending&&uid===cloudUid&&cloudReady){
+   cloudSavePending=false;
+   clearTimeout(cloudSaveTimer);
+   cloudSaveTimer=setTimeout(()=>saveCloudState(),200);
+  }
+ }
 }
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='hidden'&&cloudUid&&cloudReady){
+  clearTimeout(cloudSaveTimer);
+  saveCloudState();
+ }
+});
 function freshPlayer(){return {coins:100,keys:3,av:'👤',fr:'none',title:'มือใหม่ถอดรหัส',avs:['👤'],frs:['none'],tts:['มือใหม่ถอดรหัส'],used:[],friends:[],chats:{},trophies:[],certs:0,coinsEarned:0}};
 db=ld()||{users:{},cur:null,codes:{PAPER2026:{coins:50},KEYMASTER:{keys:2},GOLDRUSH:{coins:100},TRAP999:{trap:1}},
 news:[

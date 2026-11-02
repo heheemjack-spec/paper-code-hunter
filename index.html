@@ -373,13 +373,21 @@ function vRedeem(){
  <div class="card flex gap-2 mb-4"><input id="code-in" onkeydown="if(event.key==='Enter')submitCode()" placeholder="เช่น PAPER2026" class="flex-1 px-3 py-2 rounded-xl border-2 border-p3 font-mono font-bold uppercase focus:outline-none focus:border-vgold"><button onclick="submitCode()" class="btn bg-vgold text-p9">🔓 ถอดรหัส</button></div>
  <div class="card text-left"><div class="font-bold text-sm mb-1">📜 ประวัติ (${h.length})</div><div class="text-xs font-mono space-y-1 max-h-40 overflow-y-auto">${h.length?h.slice().reverse().map(x=>`<div>${esc(x)}</div>`).join(''):'<i class="text-gray-500">ยังไม่มีประวัติ</i>'}</div></div></div>`;
 }
-async function submitCode(){
+async function applyCodeReward(u,r){
+ if(!r||!r.type||!r.value)return;
+ const n=Math.max(1,Math.min(5555,Number(r.qty)||1));
+ if(r.type==='avatar'){u.avs=Array.isArray(u.avs)?u.avs:[];if(!u.avs.includes(r.value))u.avs.push(r.value)}
+ else if(r.type==='frame'){u.frs=Array.isArray(u.frs)?u.frs:['none'];if(!u.frs.includes(r.value))u.frs.push(r.value)}
+ else if(r.type==='title'){u.tts=Array.isArray(u.tts)?u.tts:['มือใหม่ถอดรหัส'];if(!u.tts.includes(r.value))u.tts.push(r.value)}
+ else if(r.type==='card'){u.cards=u.cards||{};u.cards[r.value]=(u.cards[r.value]||0)+n}
+}
+function submitCode(){
  const c=$('code-in').value.trim().toUpperCase();if(!c)return;
  if(cloudUid){
   const {data,error}=await sb.rpc('redeem_player_code',{p_code:c});
   if(error)return toast(error.message||'แลกรหัสไม่สำเร็จ');
   if(!data||data.success!==true)return toast((data&&data.message)||'แลกรหัสไม่สำเร็จ');
-  const u=U();u.coins=data.coins;u.keys=data.keys;u.certs=data.certs;u.used=Array.isArray(u.used)?u.used:[];u.used.push(data.history);
+  const u=U();u.coins=data.coins;u.keys=data.keys;u.certs=data.certs;u.used=Array.isArray(u.used)?u.used:[];u.used.push(data.history);applyCodeReward(u,data.reward);
   if(data.category){u.cu=u.cu||{};u.cu[data.category]=c}
   if(data.shielded){if(u.fx)delete u.fx.shield;toast('🛡️ บัตรกันกับดักช่วยไว้ได้!')}
   else if(data.trap){$('alarm-msg').textContent=data.message||'คุณถูกหลอก!';$('alarm').classList.remove('hidden');$('alarm').classList.add('flex')}
@@ -393,7 +401,7 @@ async function submitCode(){
  if(d.trap&&u.fx&&u.fx.shield){delete u.fx.shield;u.used.push(c+' → 🛡️ กันกับดักสำเร็จ');sv();toast('🛡️ บัตรกันกับดักช่วยไว้ได้!');render();return}
  if(d.trap){const l=d.coins!==undefined?d.coins:50,kl=d.keys!==undefined?d.keys:1;u.coins-=l;u.keys-=kl;u.used.push(c+' → 💀 กับดัก -'+l+'🪙 -'+kl+'🔑');sv();$('alarm-msg').textContent='คุณถูกหลอก! เสีย '+l+' เหรียญ และกุญแจ '+kl+' ดอก';$('alarm').classList.remove('hidden');$('alarm').classList.add('flex');render();return}
  const mx=u.fx&&u.fx.x2?2:1;if(mx>1)delete u.fx.x2;const rc=(d.coins||0)*mx,rk=(d.keys||0)*mx,rt=d.certs||0;u.coins+=rc;u.keys+=rk;u.certs=(u.certs||0)+rt;
- u.used.push(c+' → +'+rc+'🪙 +'+rk+'🔑'+(rt?' +'+rt+'🎫':'')+(mx>1?' (×2)':''));trophy('นักถอดรหัส');if(u.used.length>=3)trophy('นักล่าโค้ดตัวจริง');sv();toast('✅ สำเร็จ! +'+rc+'🪙 +'+rk+'🔑'+(rt?' +'+rt+'🎫':''));render();
+ u.used.push(c+' → +'+rc+'🪙 +'+rk+'🔑'+(rt?' +'+rt+'🎫':'')+(d.rewardType&&d.rewardType!=='none'?' +'+(d.rewardQty||1)+' '+d.rewardType+':'+d.rewardValue:'')+(mx>1?' (×2)':''));applyCodeReward(u,{type:d.rewardType,value:d.rewardValue,qty:d.rewardQty});trophy('นักถอดรหัส');if(u.used.length>=3)trophy('นักล่าโค้ดตัวจริง');sv();toast('✅ สำเร็จ! +'+rc+'🪙 +'+rk+'🔑'+(rt?' +'+rt+'🎫':''));render();
 }
 const REQ={'av:🌟':2,'av:🚀':1,'fr:crown':2,'fr:rainbow':1,'tt:มหาเศรษฐีสมุดบันทึก':1,'tt:ผู้พิชิตความมืด':1,'tt:เทพเจ้าแห่งโค้ดลับ':2,'tt:ราชันย์นักสืบ':1,'card:post':1,'card:map':1,'key:4':1};
 const rq=k=>REQ[k]||0,rqT=k=>rq(k)?` +🎫${rq(k)}`:'';

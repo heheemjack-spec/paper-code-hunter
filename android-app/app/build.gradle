@@ -14,10 +14,18 @@ android {
         versionName '1.0'
     }
 
+    signingConfigs {
+        release {
+            storeFile file("${rootProject.projectDir}/paper-code-hunter.jks")
+            storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            keyAlias System.getenv('ANDROID_KEY_ALIAS')
+            keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+        }
+    }
+
     buildTypes {
         release {
-            // Release build is currently unsigned; signing will be configured securely
-            // with a guardian-managed keystore before public distribution.
+            signingConfig signingConfigs.release
             minifyEnabled false
         }
     }
